@@ -18,6 +18,10 @@ def compute_storage_folderpath(ep_num):
     """Compute the STORAGE_FOLDERPATH based on the EP_NUM."""
     return f"\\\\facilis\\LGS_RUSHES\\NATIFS\\LGS_EP_{ep_num}\\"
 
+def extract_file_name(source_file):
+    """Extract the file name from the source file path."""
+    return os.path.basename(source_file) if source_file else None
+
 def ale_to_xml_with_errors(ale_path, output_dir):
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
@@ -66,16 +70,30 @@ def ale_to_xml_with_errors(ale_path, output_dir):
             continue  # Skip incomplete rows
         
         # Extract required data
-        data = {col: columns[idx] for col, idx in column_indices.items()}
-        esta = columns[esta_idx] if esta_idx is not None else "0"
+        data = {col: columns[idx] if idx is not None and idx < len(columns) else "" for col, idx in column_indices.items()}
+        esta = columns[esta_idx] if esta_idx is not None and esta_idx < len(columns) else "0"
         ep_num = extract_ep_num(data["Name"])
+        file_name = extract_file_name(data["Source File"])
         
         # Check for missing or invalid data
+        error_message = []
         if any(not data[col] for col in required_columns):
-            error_report.append(f"Line {row_idx}: Missing data in required columns.")
-            continue
+            error_message.append("Missing data in required columns.")
         if ep_num is None:
-            error_report.append(f"Line {row_idx}: Invalid EP_NUM in Name field.")
+            error_message.append("Invalid EP_NUM in Name field.")
+        
+        if error_message:
+            # Add additional information (Name, Source Path, Source File, and File Name if available)
+            additional_info = []
+            if data.get("Name"):
+                additional_info.append(f"Name: {data['Name']}")
+            if data.get("Source Path"):
+                additional_info.append(f"Source Path: {data['Source Path']}")
+            if data.get("Source File"):
+                additional_info.append(f"Source File: {data['Source File']}")
+            error_report.append(
+                f"Line {row_idx}: {', '.join(error_message)} {' | '.join(additional_info)}"
+            )
             continue
         
         # Generate paths
@@ -88,6 +106,7 @@ def ale_to_xml_with_errors(ale_path, output_dir):
         ET.SubElement(root, "NAME").text = data["Name"]
         ET.SubElement(root, "EP_NUM").text = ep_num
         ET.SubElement(root, "SRC_FILENAME").text = data["Source File"]
+        ET.SubElement(root, "FILE_NAME").text = file_name
         ET.SubElement(root, "BASE_FOLDERPATH").text = data["Source Path"]
         ET.SubElement(root, "STORAGE_FOLDERPATH").text = storage_folderpath
         ET.SubElement(root, "AMF_FOLDERPATH").text = amf_folderpath

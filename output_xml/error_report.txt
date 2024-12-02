@@ -1,1 +1,2 @@
-Line 44: Invalid EP_NUM in Name field.
+Line 19: Invalid EP_NUM in Name field. Name: LGS-ABCD-7-01-5-C1 | Source Path: L:\PIANO_SANO_FILMS\UBET_NATIFS\J01_UBET_20231112\IMAGE\A002R47C\A002R47C\ | Source File: A002C009_200308_R47C.mov
+Line 44: Invalid EP_NUM in Name field. Name: TEJ | Source Path: L:\PIANO_SANO_FILMS\UBET_NATIFS\J01_UBET_20231112\SON\CANTAR_SD\UBET.CA1\2023-12-11.AAN\ | Source File: MU2750==7B 1         n5==PN.WAV
