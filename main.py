@@ -6,7 +6,7 @@ import re
 
 def extract_ep_num(name):
     """Extract the EP_NUM from the 'Name' field using regex."""
-    match = re.search(r"LGS-(\d+)-", name)
+    match = re.search(r"LGS-(\d{4})-", name)  # Ensure EP_NUM is exactly 4 digits
     return match.group(1) if match else None
 
 def compute_amf_folderpath(ep_num):
@@ -18,10 +18,11 @@ def compute_storage_folderpath(ep_num):
     """Compute the STORAGE_FOLDERPATH based on the EP_NUM."""
     return f"\\\\facilis\\LGS_RUSHES\\NATIFS\\LGS_EP_{ep_num}\\"
 
-def ale_to_xml_fixed(ale_path, output_dir):
+def ale_to_xml_with_errors(ale_path, output_dir):
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
     
+    error_report = []
     # Read the ALE file
     with open(ale_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
@@ -49,43 +50,48 @@ def ale_to_xml_fixed(ale_path, output_dir):
         raise ValueError("No 'Data' section found in the ALE file.")
     
     # Relevant column indices
-    name_idx = headers.index("Name")
-    src_file_idx = headers.index("Source File")
-    src_path_idx = headers.index("Source Path")
-    session_idx = headers.index("Session") if "Session" in headers else None
+    required_columns = ["Name", "Source File", "Source Path", "Session"]
+    column_indices = {col: headers.index(col) if col in headers else None for col in required_columns}
+    if None in column_indices.values():
+        missing_columns = [col for col, idx in column_indices.items() if idx is None]
+        raise ValueError(f"Missing required columns in ALE file: {', '.join(missing_columns)}")
+    
     esta_idx = headers.index("Esta") if "Esta" in headers else None
     
     # Parse each data row
-    for row in lines[data_start_index:]:
+    for row_idx, row in enumerate(lines[data_start_index:], start=data_start_index + 1):
         columns = row.strip().split("\t")
-        if len(columns) <= max(name_idx, src_file_idx, src_path_idx):
+        if len(columns) <= max(column_indices.values()):
+            error_report.append(f"Line {row_idx}: Incomplete data row.")
             continue  # Skip incomplete rows
         
         # Extract required data
-        name = columns[name_idx]
-        src_filename = columns[src_file_idx]
-        base_folderpath = columns[src_path_idx]
-        session = columns[session_idx] if session_idx is not None else None
+        data = {col: columns[idx] for col, idx in column_indices.items()}
         esta = columns[esta_idx] if esta_idx is not None else "0"
-        ep_num = extract_ep_num(name)
+        ep_num = extract_ep_num(data["Name"])
         
+        # Check for missing or invalid data
+        if any(not data[col] for col in required_columns):
+            error_report.append(f"Line {row_idx}: Missing data in required columns.")
+            continue
         if ep_num is None:
-            continue  # Skip if EP_NUM cannot be extracted
+            error_report.append(f"Line {row_idx}: Invalid EP_NUM in Name field.")
+            continue
         
+        # Generate paths
         storage_folderpath = compute_storage_folderpath(ep_num)
         amf_folderpath = compute_amf_folderpath(ep_num)
         esta_value = "TRUE" if esta == "1" else "FALSE"
         
         # Create XML structure
         root = ET.Element("Clip")
-        ET.SubElement(root, "NAME").text = name
+        ET.SubElement(root, "NAME").text = data["Name"]
         ET.SubElement(root, "EP_NUM").text = ep_num
-        ET.SubElement(root, "SRC_FILENAME").text = src_filename
-        ET.SubElement(root, "BASE_FOLDERPATH").text = base_folderpath
+        ET.SubElement(root, "SRC_FILENAME").text = data["Source File"]
+        ET.SubElement(root, "BASE_FOLDERPATH").text = data["Source Path"]
         ET.SubElement(root, "STORAGE_FOLDERPATH").text = storage_folderpath
         ET.SubElement(root, "AMF_FOLDERPATH").text = amf_folderpath
-        if session:
-            ET.SubElement(root, "SESSION").text = session
+        ET.SubElement(root, "SESSION").text = data["Session"]
         ET.SubElement(root, "ESTA").text = esta_value
         
         # Convert to a formatted XML string
@@ -93,9 +99,18 @@ def ale_to_xml_fixed(ale_path, output_dir):
         pretty_xml = parseString(raw_xml).toprettyxml(indent="  ")
         
         # Write the XML file
-        output_file = os.path.join(output_dir, f"{os.path.splitext(src_filename)[0]}.xml")
+        output_file = os.path.join(output_dir, f"{os.path.splitext(data['Source File'])[0]}.xml")
         with open(output_file, 'w', encoding='utf-8') as xml_file:
             xml_file.write(pretty_xml)
+    
+    # Write error report if any errors occurred
+    if error_report:
+        error_file_path = os.path.join(output_dir, "error_report.txt")
+        with open(error_file_path, 'w', encoding='utf-8') as error_file:
+            error_file.write("\n".join(error_report))
+        print(f"Errors found. Report written to: {error_file_path}")
+    else:
+        print("No errors found.")
 
 def main():
     # Set up argument parsing
@@ -106,8 +121,8 @@ def main():
     )
     args = parser.parse_args()
     
-    # Process the ALE file
-    ale_to_xml_fixed(args.ale_file, args.output)
+    # Process the ALE file with error handling
+    ale_to_xml_with_errors(args.ale_file, args.output)
     print(f"XML files generated in directory: {args.output}")
 
 if __name__ == "__main__":
