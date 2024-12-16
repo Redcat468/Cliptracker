@@ -29,7 +29,7 @@ def log_message(log_file, level, message, context=None, terminal_fallback=False)
 
 def extract_ep_num(name):
     """Extract the EP_NUM from the 'Name' field using regex."""
-    match = re.search(r"LGS-(\d{4})-", name)  # Ensure EP_NUM is exactly 4 digits
+    match = re.search(r"LGS-(\d{4})-", name)  # Ensure EP_NUM is exactly 4 digits TEST
     return match.group(1) if match else None
 
 def compute_amf_folderpath(ep_num):
