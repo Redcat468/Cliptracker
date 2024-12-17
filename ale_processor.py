@@ -7,6 +7,14 @@ class AleProcessor:
     def __init__(self):
         self.global_errors = []  # Erreurs globales
         self.rows = []  # Toutes les lignes avec erreurs ou non
+        # Lire la valeur de rtfactor à partir du fichier rtfactor.conf
+        try:
+            with open("rtfactor.conf", "r", encoding="utf-8") as file:
+                line = file.readline().strip()
+                self.rtfactor = float(line.replace('O', '0'))
+        except (FileNotFoundError, ValueError) as e:
+            self.log_global_error(f"Erreur lors de la lecture de rtfactor.conf : {str(e)}")
+            self.rtfactor = 10  # Valeur par défaut en cas d'erreur
 
     def log_global_error(self, message):
         """Ajoute une erreur globale."""
@@ -54,7 +62,7 @@ class AleProcessor:
             return
 
         headers = lines[column_start_index].strip().split("\t")
-        required_columns = ["Name", "Source File", "Source Path", "Session"]
+        required_columns = ["Name", "Source File", "Source Path", "Session", "Duration"]
         column_indices = {col: headers.index(col) if col in headers else None for col in required_columns}
         esta_idx = headers.index("Esta") if "Esta" in headers else None
 
@@ -83,6 +91,10 @@ class AleProcessor:
             if not self.extract_ep_num(data["Name"]):
                 errors.append("Numéro d'épisode invalide dans 'Name'.")
 
+            # Récupérer la durée
+            duration_value = data.get("Duration", "")
+
+
             # Ajouter la colonne ESTA
             esta_value = "FALSE"  # Par défaut
             esta_decorname = ""   # Champ vide par défaut
@@ -92,6 +104,7 @@ class AleProcessor:
 
             data["ESTA"] = esta_value
             data["ESTA_DECORNAME"] = esta_decorname
+            data["Duration"] = duration_value
 
             data["errors"] = errors
             self.rows.append(data)
@@ -135,6 +148,56 @@ class AleProcessor:
         pretty_xml = parseString(ET.tostring(root, encoding="unicode")).toprettyxml(indent="  ")
         with open(os.path.join(output_dir, file_name), "w", encoding="utf-8") as f:
             f.write(pretty_xml)
+
+    # Ajout de la méthode calculate_total_duration
+    def calculate_total_duration(self):
+        """Additionne les durées des fichiers non .WAV et retourne un format lisible."""
+        total_frames = 0
+        fps = 25  # Images par seconde (frames per second)
+
+
+        for row in self.rows:
+            source_file = row.get("Source File", "")
+            duration = row.get("Duration", "")
+
+            # Ignorer les fichiers .WAV
+            if source_file.lower().endswith(".wav"):
+                continue
+
+            # Vérifier si la durée est au bon format HH:MM:SS:FF
+            if duration and re.match(r"^\d{2}:\d{2}:\d{2}:\d{2}$", duration):
+                hh, mm, ss, ff = map(int, duration.split(":"))
+                total_frames += (hh * 3600 + mm * 60 + ss) * fps + ff
+
+        # Conversion des frames en HH:MM:SS
+        total_seconds, remaining_frames = divmod(total_frames, fps)
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        return f"{hours:02} heures {minutes:02} min {seconds:02} secondes"
+
+    def calculate_adjusted_duration(self):
+        """Calcule la durée ajustée en divisant la durée totale par le facteur rtfactor."""
+        total_duration = self.calculate_total_duration()
+        total_seconds = self._convert_duration_to_seconds(total_duration)
+        
+        # Diviser par le facteur rtfactor
+        adjusted_seconds = total_seconds / self.rtfactor
+        
+        # Conversion des secondes ajustées en HH:MM:SS
+        hours, remainder = divmod(int(adjusted_seconds), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        
+        return f"{hours:02} heures {minutes:02} min {seconds:02} secondes"
+
+    def _convert_duration_to_seconds(self, duration):
+        """Convertit une durée au format 'HH heures MM min SS secondes' en secondes."""
+        match = re.match(r"(\d{2}) heures (\d{2}) min (\d{2}) secondes", duration)
+        if match:
+            hh, mm, ss = map(int, match.groups())
+            return hh * 3600 + mm * 60 + ss
+        return 0  # Retourne 0 si la conversion échoue
+
 
     def get_results(self):
         """Retourne les erreurs globales et les lignes traitées."""
