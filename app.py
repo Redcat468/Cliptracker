@@ -32,7 +32,7 @@ template = """
     <script>
         function confirmIngest(hasErrors) {
             if (hasErrors) {
-                return confirm("Certaines lignes contiennent des erreurs. Voulez-vous continuer ?");
+                return confirm("Certaines elements contiennent des erreurs et les clips associés ne seront pas traités. Voulez-vous continuer ?");
             }
             return true;
         }
@@ -150,7 +150,10 @@ def ingest():
             processor.create_xml(row, output_dir)
             ale_generated = True
     if ale_generated:
-        flash("Fichiers envoyés en traitement avec succès !", "success")
+        from datetime import datetime
+
+        current_time = datetime.now().strftime("%H:%M:%S")
+        flash(f"Fichiers envoyés en traitement avec succès ! Temps de traitement : {duration_process}. Heure actuelle : {current_time}", "success")
     else:
         flash("Aucun fichier envoyé", "error")
     return redirect(url_for("index"))
