@@ -4,7 +4,7 @@ from ale_processor import AleProcessor
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
-# Template HTML avec tableau responsive et colonnes ajustables
+# Template HTML
 template = """
 <!DOCTYPE html>
 <html lang="en">
@@ -12,100 +12,181 @@ template = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analyseur ALE</title>
-    <!-- Materialize CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <style>
         /* Styles généraux */
-        body { margin: 0; padding: 0; }
-        .error-row { background-color: #ffebee; color: #c62828; font-weight: bold; }
-        .success-row { background-color: #e8f5e9; color: #2e7d32; }
-        .table-container { margin-top: 20px; width: 100%; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 1000px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
 
-        /* Tableau responsive */
-        table { width: 100%; table-layout: fixed; border-collapse: collapse; }
-        th, td {
-            border: 1px solid #ddd;
+        /* Messages flash */
+        .flash-message {
             padding: 10px;
-            resize: horizontal;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .flash-error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .flash-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        /* Formulaire et boutons */
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .file-input {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        input[type="file"] {
+            display: inline-block;
+            font-size: 16px;
+            padding: 10px;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .btn:hover {
+            background-color: #45a049;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .btn-red {
+            background-color: #e74c3c;
+        }
+        .btn-red:hover {
+            background-color: #c0392b;
+        }
+        .btn-blue {
+            background-color: #3498db;
+        }
+        .btn-blue:hover {
+            background-color: #2980b9;
+        }
+
+        /* Tableau */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #fff;
+            border-radius: 5px;
             overflow: hidden;
-            word-wrap: break-word;
         }
-        th { background-color: #f2f2f2; font-weight: bold; text-align: left; }
-        td.small-text { font-size: 0.9em; word-wrap: break-word; white-space: pre-line; }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: #fff;
+            font-weight: bold;
+        }
+        .error-row { background-color: #ffebee; color: #c62828; }
+        .success-row { background-color: #e8f5e9; color: #2e7d32; }
     </style>
-    <script>
-        function confirmIngest(hasErrors) {
-            if (hasErrors) {
-                return confirm("Certaines lignes contiennent des erreurs. Voulez-vous continuer ?");
-            }
-            return true;
-        }
-    </script>
+
 </head>
-<body class="grey lighten-4">
-
+<body>
 <div class="container">
-    <h3 class="center-align">Analyseur ALE</h3>
+    <h3>Analyseur ALE</h3>
 
-    <!-- Affichage des messages flash -->
+    <!-- Messages flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="card-panel red lighten-4">
-                {% for category, message in messages %}
-                    <span class="red-text text-darken-4">{{ message }}</span><br>
-                {% endfor %}
-            </div>
+            {% for category, message in messages %}
+                <div class="flash-message {% if category == 'error' %}flash-error{% elif category == 'success' %}flash-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endif %}
     {% endwith %}
 
     <!-- Formulaire d'upload -->
-    <form method="POST" enctype="multipart/form-data" class="card-panel">
-        <div class="file-field input-field">
-            <div class="btn">
-                <span>Fichier ALE</span>
+    <div class="form-container">
+        <div class="file-input">
+            <form method="POST" enctype="multipart/form-data">
                 <input type="file" name="ale_file" required>
-            </div>
-            <div class="file-path-wrapper">
-                <input class="file-path validate" type="text" placeholder="Téléchargez un fichier ALE">
-            </div>
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-blue">Analyser</button>
+                </div>
+            </form>
         </div>
-        <button type="submit" class="waves-effect waves-light btn">Analyser</button>
-    </form>
+    </div>
 
     {% if results %}
-        <!-- Bouton d'Ingest avec confirmation -->
-        <form method="POST" action="{{ url_for('ingest') }}" onsubmit="return confirmIngest({{ has_errors|tojson }})">
-            <button type="submit" class="waves-effect waves-light btn green">Ingest</button>
-        </form>
+        <!-- Bouton d'Ingest -->
+        <div class="btn-container">
+            <form method="POST" action="{{ url_for('ingest') }}" onsubmit="return confirm('Voulez-vous procéder à l\'ingest ?')">
+                <button type="submit" class="btn">Ingest</button>
+            </form>
+        </div>
 
         <!-- Tableau des résultats -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 20%;">Name</th>
-                        <th style="width: 20%;">Source File</th>
-                        <th style="width: 40%;">Source Path</th>
-                        <th style="width: 20%;">Erreur</th>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Source File</th>
+                    <th>Erreur</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results.rows %}
+                    <tr class="{% if row.error %}error-row{% else %}success-row{% endif %}">
+                        <td data-label="Name">{{ row.Name }}</td>
+                        <td data-label="Source File">{{ row['Source File'] }}</td>
+                        <td data-label="Erreur">{{ row.error if row.error else 'OK' }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for row in results.rows %}
-                        <tr class="{% if row.error %}error-row{% else %}success-row{% endif %}">
-                            <td style="white-space: nowrap;">{{ row.Name }}</td>
-                            <td>{{ row['Source File'] }}</td>
-                            <td class="small-text">{{ row['Source Path'] }}</td>
-                            <td>{{ row.error if row.error else 'OK' }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                {% endfor %}
+            </tbody>
+        </table>
     {% endif %}
 </div>
 
-<!-- Materialize JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
 </body>
 </html>
 """
@@ -115,7 +196,7 @@ def index():
     results = None
     has_errors = False
     if request.method == "POST":
-        file = request.files.get("ale_file")  # Récupérer le fichier uploadé
+        file = request.files.get("ale_file")
         if not file:
             flash("Aucun fichier sélectionné.", "error")
         else:

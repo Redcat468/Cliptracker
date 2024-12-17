@@ -12,16 +12,18 @@ class AleProcessor:
         """Ajoute une erreur globale."""
         self.global_errors.append({"level": "ERROR", "message": message})
 
-    def log_row_error(self, row_data, message):
-        """Ajoute une erreur à une ligne."""
-        if "errors" not in row_data:
-            row_data["errors"] = []
-        row_data["errors"].append(message)
-
     def contains_special_characters(self, filename):
         """Vérifie les caractères spéciaux dans un nom de fichier."""
         name, _ = os.path.splitext(filename)
         return bool(re.search(r"[^a-zA-Z0-9=_\-\s]", name))
+
+    def contains_special_characters_in_path(self, path):
+        """Vérifie les caractères spéciaux dans le chemin. Autorise /, \, _, -, :, et ."""
+        return bool(re.search(r"[^a-zA-Z0-9=_\-\./:\\]", path))
+
+    def contains_invalid_characters_in_name(self, name):
+        """Vérifie si le champ 'Name' contient des caractères invalides."""
+        return bool(re.search(r"[^a-zA-Z0-9\-]", name))
 
     def extract_ep_num(self, name):
         """Extrait le numéro d'épisode."""
@@ -42,7 +44,6 @@ class AleProcessor:
         lines = ale_contents.splitlines()
         column_start_index = None
 
-        # Détection des colonnes
         for i, line in enumerate(lines):
             if line.strip() == "Column":
                 column_start_index = i + 1
@@ -54,14 +55,13 @@ class AleProcessor:
 
         headers = lines[column_start_index].strip().split("\t")
         required_columns = ["Name", "Source File", "Source Path", "Session"]
-
         column_indices = {col: headers.index(col) if col in headers else None for col in required_columns}
+        esta_idx = headers.index("Esta") if "Esta" in headers else None
 
         if any(idx is None for idx in column_indices.values()):
             self.log_global_error("Colonnes manquantes dans le fichier ALE.")
             return
 
-        # Détection des données
         data_start_index = lines.index("Data") + 1 if "Data" in lines else None
         if not data_start_index:
             self.log_global_error("Section 'Data' manquante.")
@@ -72,7 +72,6 @@ class AleProcessor:
             data = {col: columns[idx] if idx < len(columns) else "" for col, idx in column_indices.items()}
             errors = []
 
-            # Validation des champs
             if not all(data[col] for col in required_columns):
                 errors.append(f"Données manquantes à la ligne {row_idx}.")
             if self.contains_special_characters(data["Source File"]):
@@ -84,18 +83,20 @@ class AleProcessor:
             if not self.extract_ep_num(data["Name"]):
                 errors.append("Numéro d'épisode invalide dans 'Name'.")
 
+            # Ajouter la colonne ESTA
+            esta_value = "FALSE"  # Par défaut
+            esta_decorname = ""   # Champ vide par défaut
+            if esta_idx is not None and columns[esta_idx]:
+                esta_value = "TRUE"
+                esta_decorname = columns[esta_idx]  # Récupérer la valeur de la colonne "Esta"
+
+            data["ESTA"] = esta_value
+            data["ESTA_DECORNAME"] = esta_decorname
+
             data["errors"] = errors
             self.rows.append(data)
 
         self.duplicate_errors()
-
-    def contains_invalid_characters_in_name(self, name):
-        """Vérifie si le champ 'Name' contient des caractères autres que lettres, chiffres et '-'. """
-        return bool(re.search(r"[^a-zA-Z0-9\-]", name))
-
-    def contains_special_characters_in_path(self, path):
-        """Vérifie si le chemin contient des caractères spéciaux non autorisés."""
-        return bool(re.search(r"[^a-zA-Z0-9=:_\-\./\\]", path))
 
     def duplicate_errors(self):
         """Duplique les lignes avec plusieurs erreurs pour chaque erreur individuelle."""
@@ -119,13 +120,17 @@ class AleProcessor:
         file_name = os.path.splitext(row["Source File"])[0] + ".xml"
 
         root = ET.Element("Clip")
-        ET.SubElement(root, "NAME").text = row["Name"]
+        ET.SubElement(root, "SESSION").text = row["Session"]
         ET.SubElement(root, "EP_NUM").text = ep_num
+        ET.SubElement(root, "NAME").text = row["Name"]
         ET.SubElement(root, "SRC_FILENAME").text = row["Source File"]
         ET.SubElement(root, "BASE_FOLDERPATH").text = row["Source Path"]
         ET.SubElement(root, "STORAGE_FOLDERPATH").text = self.compute_storage_folderpath(ep_num)
         ET.SubElement(root, "AMF_FOLDERPATH").text = self.compute_amf_folderpath(ep_num)
-        ET.SubElement(root, "SESSION").text = row["Session"]
+        
+        ET.SubElement(root, "ESTA").text = row["ESTA"]
+        if row["ESTA_DECORNAME"]:  # Si une valeur est présente
+            ET.SubElement(root, "ESTA_DECORNAME").text = row["ESTA_DECORNAME"]
 
         pretty_xml = parseString(ET.tostring(root, encoding="unicode")).toprettyxml(indent="  ")
         with open(os.path.join(output_dir, file_name), "w", encoding="utf-8") as f:
