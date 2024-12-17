@@ -42,6 +42,7 @@ class AleProcessor:
         lines = ale_contents.splitlines()
         column_start_index = None
 
+        # Détection des colonnes
         for i, line in enumerate(lines):
             if line.strip() == "Column":
                 column_start_index = i + 1
@@ -60,6 +61,7 @@ class AleProcessor:
             self.log_global_error("Colonnes manquantes dans le fichier ALE.")
             return
 
+        # Détection des données
         data_start_index = lines.index("Data") + 1 if "Data" in lines else None
         if not data_start_index:
             self.log_global_error("Section 'Data' manquante.")
@@ -77,13 +79,19 @@ class AleProcessor:
                 errors.append("Caractères spéciaux dans le nom du fichier.")
             if self.contains_special_characters_in_path(data["Source Path"]):
                 errors.append("Caractères spéciaux dans le chemin du fichier.")
+            if self.contains_invalid_characters_in_name(data["Name"]):
+                errors.append("Caractère invalide dans la colonne 'Name'.")
             if not self.extract_ep_num(data["Name"]):
-                errors.append("Numéro d'épisode invalide.")
+                errors.append("Numéro d'épisode invalide dans 'Name'.")
 
             data["errors"] = errors
             self.rows.append(data)
 
         self.duplicate_errors()
+
+    def contains_invalid_characters_in_name(self, name):
+        """Vérifie si le champ 'Name' contient des caractères autres que lettres, chiffres et '-'. """
+        return bool(re.search(r"[^a-zA-Z0-9\-]", name))
 
     def contains_special_characters_in_path(self, path):
         """Vérifie si le chemin contient des caractères spéciaux non autorisés."""

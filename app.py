@@ -1,10 +1,10 @@
-from flask import Flask, request, render_template_string, redirect, url_for, flash, get_flashed_messages
+from flask import Flask, request, render_template_string, redirect, url_for, flash
 from ale_processor import AleProcessor
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
-# Template HTML avec Materialize CSS
+# Template HTML avec tableau responsive et colonnes ajustables
 template = """
 <!DOCTYPE html>
 <html lang="en">
@@ -15,10 +15,23 @@ template = """
     <!-- Materialize CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <style>
+        /* Styles généraux */
+        body { margin: 0; padding: 0; }
         .error-row { background-color: #ffebee; color: #c62828; font-weight: bold; }
         .success-row { background-color: #e8f5e9; color: #2e7d32; }
-        .small-text { font-size: 0.9em; word-wrap: break-word; white-space: pre-line; }
-        .table-container { margin-top: 20px; }
+        .table-container { margin-top: 20px; width: 100%; }
+
+        /* Tableau responsive */
+        table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            resize: horizontal;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+        th { background-color: #f2f2f2; font-weight: bold; text-align: left; }
+        td.small-text { font-size: 0.9em; word-wrap: break-word; white-space: pre-line; }
     </style>
     <script>
         function confirmIngest(hasErrors) {
@@ -67,13 +80,13 @@ template = """
 
         <!-- Tableau des résultats -->
         <div class="table-container">
-            <table class="highlight responsive-table">
+            <table>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Source File</th>
-                        <th>Source Path</th>
-                        <th>Erreur</th>
+                        <th style="width: 20%;">Name</th>
+                        <th style="width: 20%;">Source File</th>
+                        <th style="width: 40%;">Source Path</th>
+                        <th style="width: 20%;">Erreur</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,22 +120,18 @@ def index():
             flash("Aucun fichier sélectionné.", "error")
         else:
             try:
-                # Tentative de décodage du fichier
                 ale_contents = file.read().decode("utf-8")
                 if "Column" not in ale_contents or "Data" not in ale_contents:
                     raise ValueError("Fichier ALE invalide : sections manquantes.")
 
-                # Traiter le fichier ALE
                 processor = AleProcessor()
                 processor.process_ale_file(ale_contents)
                 results = processor.get_results()
 
-                # Vérification des erreurs globales
                 if processor.global_errors:
                     for error in processor.global_errors:
                         flash(error["message"], "error")
 
-                # Dupliquer les lignes avec erreurs multiples
                 processor.duplicate_errors()
                 app.config["ale_rows"] = processor.rows
                 has_errors = any(row.get("error") for row in processor.rows)
