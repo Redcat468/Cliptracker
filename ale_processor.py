@@ -26,7 +26,7 @@ class AleProcessor:
         return bool(re.search(r"[^a-zA-Z0-9=_\-\s]", name))
 
     def contains_special_characters_in_path(self, path):
-        """Vérifie les caractères spéciaux dans le chemin. Autorise /, \, _, -, :, et ."""
+        """Vérifie les caractères spéciaux dans le chemin. Autorise /, \\, _, -, :, et ."""
         return bool(re.search(r"[^a-zA-Z0-9=_\-\./:\\]", path))
 
     def contains_invalid_characters_in_name(self, name):
@@ -49,6 +49,7 @@ class AleProcessor:
 
     def process_ale_file(self, ale_contents):
         """Analyse un fichier ALE."""
+        
         lines = ale_contents.splitlines()
         column_start_index = None
 
@@ -60,11 +61,20 @@ class AleProcessor:
         if column_start_index is None:
             self.log_global_error("Section 'Column' manquante.")
             return
+        headers = lines[column_start_index].strip().split("\t")
+        required_columns = ["Name", "Start", "Esta", "Session", "End", "Ingestator", "Ingest_manuel", "Duration", "Source File", "Source Path"]
+        
+        # Vérification de la présence de toutes les colonnes requises
+        if not all(col in headers for col in required_columns):
+            self.log_global_error("Colonnes manquantes dans le fichier ALE.")
+            return
 
         headers = lines[column_start_index].strip().split("\t")
         required_columns = ["Name", "Source File", "Source Path", "Session", "Duration"]
         column_indices = {col: headers.index(col) if col in headers else None for col in required_columns}
         esta_idx = headers.index("Esta") if "Esta" in headers else None
+        ingestator_idx = headers.index("Ingestator") if "Ingestator" in headers else None
+        ingest_manuel_idx = headers.index("Ingest_manuel") if "Ingest_manuel" in headers else None
 
         if any(idx is None for idx in column_indices.values()):
             self.log_global_error("Colonnes manquantes dans le fichier ALE.")
@@ -81,7 +91,8 @@ class AleProcessor:
             errors = []
 
             if not all(data[col] for col in required_columns):
-                errors.append(f"Données manquantes à la ligne {row_idx}.")
+                erreurs = [col for col in required_columns if not data[col]]
+                errors.append(f"Données manquantes ({', '.join(erreurs)}) à la ligne {row_idx}.")
             if self.contains_special_characters(data["Source File"]):
                 errors.append("Caractères spéciaux dans le nom du fichier.")
             if self.contains_special_characters_in_path(data["Source Path"]):
@@ -94,7 +105,6 @@ class AleProcessor:
             # Récupérer la durée
             duration_value = data.get("Duration", "")
 
-
             # Ajouter la colonne ESTA
             esta_value = "FALSE"  # Par défaut
             esta_decorname = ""   # Champ vide par défaut
@@ -102,9 +112,20 @@ class AleProcessor:
                 esta_value = "TRUE"
                 esta_decorname = columns[esta_idx]  # Récupérer la valeur de la colonne "Esta"
 
+            # Récupérer les valeurs des colonnes Ingest_manuel et Ingestator
+            ingest_manuel_value = "FALSE"  # Par défaut
+            if ingest_manuel_idx is not None and columns[ingest_manuel_idx] == "1":
+                ingest_manuel_value = "TRUE"
+
+            ingestator_value = "FALSE"  # Par défaut
+            if ingestator_idx is not None and columns[ingestator_idx] == "1":
+                ingestator_value = "TRUE"
+
             data["ESTA"] = esta_value
             data["ESTA_DECORNAME"] = esta_decorname
             data["Duration"] = duration_value
+            data["INGEST_MANUEL"] = ingest_manuel_value
+            data["INGESTATOR"] = ingestator_value
 
             data["errors"] = errors
             self.rows.append(data)
@@ -140,7 +161,8 @@ class AleProcessor:
         ET.SubElement(root, "BASE_FOLDERPATH").text = row["Source Path"]
         ET.SubElement(root, "STORAGE_FOLDERPATH").text = self.compute_storage_folderpath(ep_num)
         ET.SubElement(root, "AMF_FOLDERPATH").text = self.compute_amf_folderpath(ep_num)
-        
+        ET.SubElement(root, "INGEST_MANUEL").text = row["INGEST_MANUEL"]
+        ET.SubElement(root, "INGESTATOR").text = row["INGESTATOR"]
         ET.SubElement(root, "ESTA").text = row["ESTA"]
         if row["ESTA_DECORNAME"]:  # Si une valeur est présente
             ET.SubElement(root, "ESTA_DECORNAME").text = row["ESTA_DECORNAME"]

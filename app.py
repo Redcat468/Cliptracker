@@ -1,35 +1,10 @@
-from flask import Flask, request, render_template_string, redirect, url_for, flash
+from flask import Flask, request, render_template_string, redirect, url_for, flash, get_flashed_messages
 from ale_processor import AleProcessor
 import re
+import os
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
-
-
-def sum_durations(rows):
-    total_frames = 0
-    fps = 25  # Assumption : 25 images par seconde
-
-    for row in rows:
-        duration = row.get("Duration", "").strip()  # Durée au format HH:MM:SS:II
-        source_file = row.get("Source File", "").strip()
-
-        # Ignorer les fichiers .WAV
-        if source_file.lower().endswith(".wav"):
-            continue
-
-        # Vérifier si la durée est au bon format
-        if duration and re.match(r"^\d{2}:\d{2}:\d{2}:\d{2}$", duration):
-            hh, mm, ss, ff = map(int, duration.split(":"))
-            total_frames += (hh * 3600 + mm * 60 + ss) * fps + ff
-
-    # Conversion des frames en HH:MM:SS
-    total_seconds, frames = divmod(total_frames, fps)
-    hours, remainder = divmod(total_seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-
-    return f"{hours:02} heures {minutes:02} min {seconds:02} secondes"
-
 
 # Template HTML
 template = """
@@ -54,10 +29,29 @@ template = """
         .error-row { background-color: #ffebee; color: #c62828; }
         .success-row { background-color: #e8f5e9; color: #2e7d32; }
     </style>
+    <script>
+        function confirmIngest(hasErrors) {
+            if (hasErrors) {
+                return confirm("Certaines lignes contiennent des erreurs. Voulez-vous continuer ?");
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
 <div class="container">
-    <h3>Analyseur ALE</h3>
+    <h3>Metatracker Analyse</h3>
+
+    <!-- Affichage des messages flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-message">
+                {% for category, message in messages %}
+                    <span class="{{ 'flash-' + category }}">{{ message }}</span><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
     <!-- Volume de rushes -->
     {% if duration_total %}
@@ -77,6 +71,13 @@ template = """
     </form>
 
     {% if results %}
+        <!-- Bouton d'Ingest avec confirmation -->
+        <div style="text-align: center; margin-top: 20px;"> <!-- Ajout d'espace entre les boutons -->
+            <form method="POST" action="{{ url_for('ingest') }}" onsubmit="return confirmIngest({{ has_errors|tojson }})">
+                <button type="submit" class="btn">Envoyer à Vantage</button>
+            </form>
+        </div>
+
         <table>
             <thead>
                 <tr>
@@ -106,6 +107,7 @@ def index():
     results = None
     duration_total = None
     duration_process = None
+    has_errors = False
 
     if request.method == "POST":
         file = request.files.get("ale_file")
@@ -122,11 +124,36 @@ def index():
                 duration_total = processor.calculate_total_duration()
                 duration_process = processor.calculate_adjusted_duration()
 
+                # Vérification des erreurs globales
+                if processor.global_errors:
+                    for error in processor.global_errors:
+                        flash(error["message"], "error")
+
+                # Dupliquer les lignes avec erreurs multiples
+                processor.duplicate_errors()
+                app.config["ale_rows"] = processor.rows
+                has_errors = any(row.get("error") for row in processor.rows)
+
             except Exception as e:
                 flash(f"Erreur : {str(e)}", "error")
 
-    return render_template_string(template, results=results, duration_total=duration_total, duration_process=duration_process)
+    return render_template_string(template, results=results, duration_total=duration_total, duration_process=duration_process, has_errors=has_errors)
 
+@app.route("/ingest", methods=["POST"])
+def ingest():
+    rows = app.config.get("ale_rows", [])
+    output_dir = "output_xml"
+    processor = AleProcessor()
+    ale_generated = False
+    for row in rows:
+        if not row.get("error"):
+            processor.create_xml(row, output_dir)
+            ale_generated = True
+    if ale_generated:
+        flash("Fichiers envoyés en traitement avec succès !", "success")
+    else:
+        flash("Aucun fichier envoyé", "error")
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
