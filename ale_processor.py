@@ -75,6 +75,8 @@ class AleProcessor:
                 errors.append(f"Données manquantes à la ligne {row_idx}.")
             if self.contains_special_characters(data["Source File"]):
                 errors.append("Caractères spéciaux dans le nom du fichier.")
+            if self.contains_special_characters_in_path(data["Source Path"]):
+                errors.append("Caractères spéciaux dans le chemin du fichier.")
             if not self.extract_ep_num(data["Name"]):
                 errors.append("Numéro d'épisode invalide.")
 
@@ -82,6 +84,10 @@ class AleProcessor:
             self.rows.append(data)
 
         self.duplicate_errors()
+
+    def contains_special_characters_in_path(self, path):
+        """Vérifie si le chemin contient des caractères spéciaux non autorisés."""
+        return bool(re.search(r"[^a-zA-Z0-9=:_\-\./\\]", path))
 
     def duplicate_errors(self):
         """Duplique les lignes avec plusieurs erreurs pour chaque erreur individuelle."""
