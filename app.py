@@ -153,7 +153,7 @@ def ingest():
         from datetime import datetime
 
         current_time = datetime.now().strftime("%H:%M:%S")
-        flash(f"Fichiers envoyés en traitement avec succès ! Temps de traitement : {duration_process}. Heure actuelle : {current_time}", "success")
+        flash(f"Fichiers envoyés en traitement avec succès !", "success")
     else:
         flash("Aucun fichier envoyé", "error")
     return redirect(url_for("index"))
