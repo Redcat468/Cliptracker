@@ -17,7 +17,6 @@ template = """
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; color: #333; }
         .container { margin: 20px auto; padding: 20px; max-width: 1000px; background: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-        h3 { text-align: center; color: #2c3e50; }
         .volume { text-align: center; font-weight: bold; color: #2e7d32; margin-bottom: 20px; }
         .flash-message { padding: 10px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; }
         .flash-error { background-color: #ffebee; color: #c62828; }
@@ -39,9 +38,10 @@ template = """
     </script>
 </head>
 <body>
+<div class="logo-container" style="display: flex; justify-content: center;">
+    <img src="{{ url_for('static', filename='images/cliptracker.svg') }}" alt="ClipTracker Logo" style="width: 50%; height: auto;">
+</div>
 <div class="container">
-    <h3>Metatracker Analyse</h3>
-
     <!-- Affichage des messages flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
