@@ -18,7 +18,9 @@ template = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyseur ALE</title>
+    <title>Cliptracker</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/cliptracker.ico') }}">
+
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; color: #333; }
         .container { margin: 20px auto; padding: 20px; max-width: 1000px; background: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
