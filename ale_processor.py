@@ -12,9 +12,14 @@ class AleProcessor:
             with open("rtfactor.conf", "r", encoding="utf-8") as file:
                 line = file.readline().strip()
                 self.rtfactor = float(line.replace('O', '0'))
-        except (FileNotFoundError, ValueError) as e:
+        except FileNotFoundError:
+            self.log_global_error("Fichier rtfactor.conf non trouvé, création du fichier avec la valeur par défaut.")
+            with open("rtfactor.conf", "w", encoding="utf-8") as file:
+                file.write("10.0")
+            self.rtfactor = 10.0
+        except ValueError as e:
             self.log_global_error(f"Erreur lors de la lecture de rtfactor.conf : {str(e)}")
-            self.rtfactor = 10  # Valeur par défaut en cas d'erreur
+            self.rtfactor = 10.0  # Valeur par défaut en cas d'erreur
 
     def log_global_error(self, message):
         """Ajoute une erreur globale."""

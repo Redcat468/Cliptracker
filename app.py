@@ -1,7 +1,12 @@
 from flask import Flask, request, render_template_string, redirect, url_for, flash, get_flashed_messages
 from ale_processor import AleProcessor
 import re
+import sys
 import os
+import threading
+import webbrowser
+from pystray import Icon, MenuItem, Menu
+from PIL import Image
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -218,5 +223,41 @@ def ingest():
         flash("Aucun fichier envoyé", "error")
     return redirect(url_for("index"))
 
+def run_server():
+    app.run(debug=False, host='0.0.0.0', port=5000)
+
+def create_tray_icon():
+    # Charger l'icône
+    if getattr(sys, 'frozen', False):
+        # Chemin pour les exécutables PyInstaller
+        base_path = sys._MEIPASS
+    else:
+        # Chemin pour le mode script
+        base_path = os.path.dirname(__file__)
+
+    icon_path = os.path.join(base_path, 'static', 'images', 'cliptracker.ico')
+    icon_image = Image.open(icon_path)
+
+    def open_web_interface():
+        webbrowser.open("http://127.0.0.1:5000")
+
+    def quit_program(icon, item):
+        icon.stop()
+        os._exit(0)
+
+    menu = Menu(
+        MenuItem("Ouvrir l'interface Web", lambda: open_web_interface()),
+        MenuItem("Quitter", quit_program)
+    )
+
+    tray_icon = Icon("ClipTracker", icon_image, menu=menu)
+    tray_icon.run()
+    open_web_interface()
+
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    server_thread = threading.Thread(target=run_server)
+    server_thread.daemon = True
+    server_thread.start()
+
+    create_tray_icon()
+    
