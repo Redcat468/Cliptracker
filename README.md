@@ -10,6 +10,7 @@ ClipTracker is a metadata broker that facilitates the transformation of speciall
 - **XML Conversion**: Generate structured XML files tailored for Vantage from the provided ALE data.
 - **Web Interface**: Accessible through a local web browser for intuitive file management.
 - **System Tray Integration**: Launches in the background with a system tray icon for quick interactions.
+- The duration of the rushes to be processed is displayed, along with a simulation of the processing time required in Vantage. By default, a "Realtime factor" of 10 is applied, but after the first analysis, an `rtfactor.conf` file is created next to the executable, allowing you to adjust this factor to match your workflow.
 
 ## Prerequisites
 
@@ -45,7 +46,7 @@ To properly configure the "Bin View" in Avid Media Composer, ensure the followin
 
 ## Test File
 
-A sample ALE file is provided in the `dist` directory for testing purposes. Use it to explore the application's features and validate the workflow.
+A sample ALE file is provided (`dist/test.ALE`) for testing purposes. Use it to explore the application's features and validate the workflow.
 
 ## Contribution
 
@@ -53,5 +54,4 @@ Contributions are welcome! Please submit pull requests with clear descriptions o
 
 ## License
 
-This project is licensed under the GPL-3.0 License. See the `LICENSE` file for more details.
-
+This project is licensed under the GPL-3.0 License. This license allows users to run, study, share, and modify the software while ensuring that all derivatives remain under the same license. For full details, see the `LICENSE` file.&#x20;
