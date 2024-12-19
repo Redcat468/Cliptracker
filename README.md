@@ -1,5 +1,3 @@
-# ClipTracker
-
 ![ClipTracker Logo](static/images/cliptracker.svg)
 
 
