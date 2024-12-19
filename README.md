@@ -1,5 +1,8 @@
 # ClipTracker
 
+![ClipTracker Logo](static/images/cliptracker.svg)
+
+
 ## Description
 
 ClipTracker is a metadata broker that facilitates the transformation of specially formatted ALE (Avid Log Exchange) files into precisely structured XML files for use with Telestream Vantage workflows. These generated XML files are designed to be sidecar files accompanying native media files. The application provides a web interface for uploading, analyzing, and processing ALE files, alongside a system tray icon for quick access.
