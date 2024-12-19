@@ -21,12 +21,56 @@ template = """
         .flash-message { padding: 10px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; }
         .flash-error { background-color: #ffebee; color: #c62828; }
         .flash-success { background-color: #e8f5e9; color: #2e7d32; }
-        .btn { display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #4CAF50; border: none; border-radius: 5px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background-color: #4CAF50; color: #fff; }
+        .btn { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            font-size: 16px; 
+            color: #fff; 
+            background-color: #4CAF50; 
+            border: none; 
+            border-radius: 15px; 
+            cursor: pointer; 
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3); 
+            transition: background-color 0.2s ease, transform 0.2s ease; 
+        }
+        .btn:hover { 
+            background-color: #45a049; 
+            transform: translateY(-2px); 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+            background: #fff; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            border-radius: 8px; 
+            overflow: hidden; 
+        }
+        th, td { 
+            padding: 12px; 
+            border-bottom: 1px solid #ddd; 
+            text-align: left; 
+            transition: background-color 0.3s ease; 
+        }
+        th { 
+            background-color: #4CAF50; 
+            color: #fff; 
+            cursor: pointer; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1; 
+        }
+        th:hover { 
+            background-color: #45a049; 
+        }
+        tr:hover td { 
+            background-color: #f1f1f1; 
+        }
         .error-row { background-color: #ffebee; color: #c62828; }
         .success-row { background-color: #e8f5e9; color: #2e7d32; }
+        .file-input-container { display: flex; justify-content: center; margin-top: 20px; }
+        .file-input { padding: 10px; border: 2px dashed #ccc; border-radius: 5px; background-color: #f9f9f9; cursor: pointer; transition: background-color 0.3s ease; }
+        .file-input:hover { background-color: #e0e0e0; }
     </style>
     <script>
         function confirmIngest(hasErrors) {
@@ -35,11 +79,25 @@ template = """
             }
             return true;
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+            const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+                v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+            )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+            document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+                const table = th.closest('table');
+                Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
+                    .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+                    .forEach(tr => table.appendChild(tr) );
+            })));
+        });
     </script>
 </head>
 <body>
-<div class="logo-container" style="display: flex; justify-content: center;">
-    <img src="{{ url_for('static', filename='images/cliptracker.svg') }}" alt="ClipTracker Logo" style="width: 50%; height: auto;">
+<div class="logo-container" style="display: flex; justify-content: center; margin-top: 20px;">
+    <img src="{{ url_for('static', filename='images/cliptracker.svg') }}" alt="ClipTracker Logo" style="width: 40%; height: auto;">
 </div>
 <div class="container">
     <!-- Affichage des messages flash -->
@@ -64,7 +122,9 @@ template = """
 
     <!-- Formulaire -->
     <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="ale_file" required>
+        <div class="file-input-container">
+            <input type="file" name="ale_file" class="file-input" required>
+        </div>
         <div style="text-align: center; margin-top: 10px;">
             <button type="submit" class="btn">Analyser</button>
         </div>
@@ -74,7 +134,7 @@ template = """
         <!-- Bouton d'Ingest avec confirmation -->
         <div style="text-align: center; margin-top: 20px;"> <!-- Ajout d'espace entre les boutons -->
             <form method="POST" action="{{ url_for('ingest') }}" onsubmit="return confirmIngest({{ has_errors|tojson }})">
-                <button type="submit" class="btn">Envoyer à Vantage</button>
+                <button type="submit" class="btn">Envoyer en traitement</button>
             </form>
         </div>
 
