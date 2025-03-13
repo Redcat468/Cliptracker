@@ -7,6 +7,8 @@ import threading
 import webbrowser
 from pystray import Icon, MenuItem, Menu
 from PIL import Image
+from flask import send_file
+
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -209,24 +211,46 @@ def index():
 @app.route("/ingest", methods=["POST"])
 def ingest():
     rows = app.config.get("ale_rows", [])
-    output_dir = "output_xml"
     processor = AleProcessor()
-    ale_generated = False
-    for row in rows:
-        if not row.get("error"):
-            processor.create_xml(row, output_dir)
-            ale_generated = True
-    if ale_generated:
-        from datetime import datetime
 
-        current_time = datetime.now().strftime("%H:%M:%S")
-        flash(f"Fichiers envoyés en traitement avec succès !", "success")
+    print(f"📊 Nombre de lignes reçues par /ingest : {len(rows)}")
+
+    if rows:
+        processor.rows = rows
+        csv_path = processor.create_csv()
+
+        if csv_path:
+            flash(f"Fichier CSV généré avec succès dans : {csv_path}", "success")
+            print(f"🎯 CSV sauvegardé à : {csv_path}")
+        else:
+            flash("⚠️ Échec de la création du CSV.", "error")
+            print("⚠️ Échec de la création du CSV.")
+
     else:
-        flash("Aucun fichier envoyé", "error")
+        flash("Aucune donnée disponible pour générer le CSV.", "error")
+        print("⚠️ Aucun rush disponible pour la génération du CSV.")
+
     return redirect(url_for("index"))
 
+
+@app.route("/download_csv")
+def download_csv():
+    csv_path = os.path.join(os.getcwd(), "output_csv", "output.csv")
+
+    print(f"📂 Tentative de téléchargement du fichier : {csv_path}")  # Debugging
+
+    if not os.path.exists(csv_path):
+        print("❌ Fichier CSV introuvable !")
+        flash("⚠️ Le fichier CSV est introuvable. Veuillez réessayer.", "error")
+        return redirect(url_for("index"))
+
+    print("✅ Fichier CSV trouvé, envoi en cours...")
+    return send_file(csv_path, as_attachment=True, download_name="rushes_export.csv")
+
+
+
 def run_server():
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
 def create_tray_icon():
     # Charger l'icône
@@ -257,9 +281,7 @@ def create_tray_icon():
     open_web_interface()
 
 if __name__ == "__main__":
-    server_thread = threading.Thread(target=run_server)
-    server_thread.daemon = True
-    server_thread.start()
-
+    run_server()
     create_tray_icon()
+
     

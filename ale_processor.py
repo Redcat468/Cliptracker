@@ -1,7 +1,6 @@
 import os
 import re
-import xml.etree.ElementTree as ET
-from xml.dom.minidom import parseString
+import csv
 
 class AleProcessor:
     def __init__(self):
@@ -152,29 +151,50 @@ class AleProcessor:
                 new_rows.append(row)
         self.rows = sorted(new_rows, key=lambda x: bool(x.get("error")), reverse=True)
 
-    def create_xml(self, row, output_dir):
-        """Crée un fichier XML pour une ligne valide."""
-        os.makedirs(output_dir, exist_ok=True)
-        ep_num = self.extract_ep_num(row["Name"])
-        file_name = os.path.splitext(row["Source File"])[0] + ".xml"
+    def create_csv(self, output_file="output.csv"):
+        """Crée un fichier CSV en utilisant le chemin défini dans 'out_folder.ini'."""
+        
+        # Lire le chemin de sortie dans out_folder.ini
+        try:
+            with open("out_folder.ini", "r", encoding="utf-8") as file:
+                output_dir = file.readline().strip()
+                if not output_dir:
+                    raise ValueError("⚠️ Chemin de sortie vide dans 'out_folder.ini' !")
+        except FileNotFoundError:
+            print("❌ ERREUR : Le fichier 'out_folder.ini' est introuvable !")
+            return None
+        except ValueError as e:
+            print(f"❌ ERREUR : {e}")
+            return None
 
-        root = ET.Element("Clip")
-        ET.SubElement(root, "SESSION").text = row["Session"]
-        ET.SubElement(root, "EP_NUM").text = ep_num
-        ET.SubElement(root, "NAME").text = row["Name"]
-        ET.SubElement(root, "SRC_FILENAME").text = row["Source File"]
-        ET.SubElement(root, "BASE_FOLDERPATH").text = row["Source Path"]
-        ET.SubElement(root, "STORAGE_FOLDERPATH").text = self.compute_storage_folderpath(ep_num)
-        ET.SubElement(root, "AMF_FOLDERPATH").text = self.compute_amf_folderpath(ep_num)
-        ET.SubElement(root, "INGEST_MANUEL").text = row["INGEST_MANUEL"]
-        ET.SubElement(root, "INGESTATOR").text = row["INGESTATOR"]
-        ET.SubElement(root, "ESTA").text = row["ESTA"]
-        if row["ESTA_DECORNAME"]:  # Si une valeur est présente
-            ET.SubElement(root, "ESTA_DECORNAME").text = row["ESTA_DECORNAME"]
+        # Vérifier et créer le dossier de sortie s'il n'existe pas
+        if not os.path.exists(output_dir):
+            print(f"📁 Création du dossier de sortie : {output_dir}")
+            os.makedirs(output_dir, exist_ok=True)
 
-        pretty_xml = parseString(ET.tostring(root, encoding="unicode")).toprettyxml(indent="  ")
-        with open(os.path.join(output_dir, file_name), "w", encoding="utf-8") as f:
-            f.write(pretty_xml)
+        output_path = os.path.join(output_dir, output_file)
+        
+        # Vérifier que les données existent
+        if not self.rows:
+            print("⚠️ Aucun rush à enregistrer dans le CSV.")
+            return None
+
+        headers = list(self.rows[0].keys())
+        print(f"📝 Colonnes du CSV : {headers}")
+
+        # Écriture du fichier
+        try:
+            with open(output_path, mode="w", newline="", encoding="utf-8") as file:
+                writer = csv.DictWriter(file, fieldnames=headers)
+                writer.writeheader()
+                writer.writerows(self.rows)
+
+            print(f"✅ CSV écrit avec succès à : {output_path}")
+            return output_path
+
+        except Exception as e:
+            print(f"❌ ERREUR lors de la création du CSV : {e}")
+            return None
 
     # Ajout de la méthode calculate_total_duration
     def calculate_total_duration(self):
