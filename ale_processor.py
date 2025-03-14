@@ -1,6 +1,7 @@
 import os
 import re
 import csv
+from datetime import datetime
 
 class AleProcessor:
     def __init__(self):
@@ -105,6 +106,8 @@ class AleProcessor:
                 errors.append("Caractère invalide dans la colonne 'Name'.")
             if not self.extract_ep_num(data["Name"]):
                 errors.append("Numéro d'épisode invalide dans 'Name'.")
+            
+            data["Fullpath"] = os.path.join(data["Source Path"], data["Source File"])
 
             # Récupérer la durée
             duration_value = data.get("Duration", "")
@@ -151,10 +154,10 @@ class AleProcessor:
                 new_rows.append(row)
         self.rows = sorted(new_rows, key=lambda x: bool(x.get("error")), reverse=True)
 
-    def create_csv(self, output_file="output.csv"):
-        """Crée un fichier CSV en utilisant le chemin défini dans 'out_folder.ini'."""
+    def create_csv(self):
+        """Crée un fichier CSV avec un timestamp dans le nom et l'enregistre dans le dossier défini par 'out_folder.ini'."""
         
-        # Lire le chemin de sortie dans out_folder.ini
+        # Lire le chemin de sortie depuis out_folder.ini
         try:
             with open("out_folder.ini", "r", encoding="utf-8") as file:
                 output_dir = file.readline().strip()
@@ -172,8 +175,11 @@ class AleProcessor:
             print(f"📁 Création du dossier de sortie : {output_dir}")
             os.makedirs(output_dir, exist_ok=True)
 
+        # 🔥 Ajouter un timestamp au nom du CSV
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")  # Format YYYYMMDD_HHMMSS
+        output_file = f"output_{timestamp}.csv"
         output_path = os.path.join(output_dir, output_file)
-        
+
         # Vérifier que les données existent
         if not self.rows:
             print("⚠️ Aucun rush à enregistrer dans le CSV.")
@@ -182,14 +188,14 @@ class AleProcessor:
         headers = list(self.rows[0].keys())
         print(f"📝 Colonnes du CSV : {headers}")
 
-        # Écriture du fichier
+        # Écriture du fichier CSV
         try:
             with open(output_path, mode="w", newline="", encoding="utf-8") as file:
                 writer = csv.DictWriter(file, fieldnames=headers)
                 writer.writeheader()
                 writer.writerows(self.rows)
 
-            print(f"✅ CSV écrit avec succès à : {output_path}")
+            print(f"✅ CSV écrit avec succès : {output_path}")
             return output_path
 
         except Exception as e:

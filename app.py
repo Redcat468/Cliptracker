@@ -232,23 +232,6 @@ def ingest():
 
     return redirect(url_for("index"))
 
-
-@app.route("/download_csv")
-def download_csv():
-    csv_path = os.path.join(os.getcwd(), "output_csv", "output.csv")
-
-    print(f"📂 Tentative de téléchargement du fichier : {csv_path}")  # Debugging
-
-    if not os.path.exists(csv_path):
-        print("❌ Fichier CSV introuvable !")
-        flash("⚠️ Le fichier CSV est introuvable. Veuillez réessayer.", "error")
-        return redirect(url_for("index"))
-
-    print("✅ Fichier CSV trouvé, envoi en cours...")
-    return send_file(csv_path, as_attachment=True, download_name="rushes_export.csv")
-
-
-
 def run_server():
     app.run(debug=True, host='0.0.0.0', port=5000)
 

@@ -1,0 +1,2 @@
+Name,Source File,Source Path,Session,Duration,Fullpath,ESTA,ESTA_DECORNAME,INGEST_MANUEL,INGESTATOR,errors,error
+LGS-18A48-7-01-1-C1,test.mov,D:\TESTS_FELIX\BASE,241201_EQ1_PM,00:00:54:09,D:\TESTS_FELIX\BASE\test.mov,FALSE,,TRUE,TRUE,"[""Numéro d'épisode invalide dans 'Name'.""]",Numéro d'épisode invalide dans 'Name'.
