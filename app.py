@@ -235,36 +235,8 @@ def ingest():
 def run_server():
     app.run(debug=True, host='0.0.0.0', port=5000)
 
-def create_tray_icon():
-    # Charger l'icône
-    if getattr(sys, 'frozen', False):
-        # Chemin pour les exécutables PyInstaller
-        base_path = sys._MEIPASS
-    else:
-        # Chemin pour le mode script
-        base_path = os.path.dirname(__file__)
-
-    icon_path = os.path.join(base_path, 'static', 'images', 'cliptracker.ico')
-    icon_image = Image.open(icon_path)
-
-    def open_web_interface():
-        webbrowser.open("http://127.0.0.1:5000")
-
-    def quit_program(icon, item):
-        icon.stop()
-        os._exit(0)
-
-    menu = Menu(
-        MenuItem("Ouvrir l'interface Web", lambda: open_web_interface()),
-        MenuItem("Quitter", quit_program)
-    )
-
-    tray_icon = Icon("ClipTracker", icon_image, menu=menu)
-    tray_icon.run()
-    open_web_interface()
 
 if __name__ == "__main__":
     run_server()
-    create_tray_icon()
 
     

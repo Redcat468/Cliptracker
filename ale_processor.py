@@ -31,8 +31,8 @@ class AleProcessor:
         return bool(re.search(r"[^a-zA-Z0-9=_\-\s]", name))
 
     def contains_special_characters_in_path(self, path):
-        """Vérifie les caractères spéciaux dans le chemin. Autorise /, \\, _, -, :, et ."""
-        return bool(re.search(r"[^a-zA-Z0-9=_\-\./:\\]", path))
+        """Vérifie les caractères spéciaux dans le chemin. Autorise /, \\, _, -, :, ., et les espaces"""
+        return bool(re.search(r"[^a-zA-Z0-9=_\-\s/:\\\\]", path))
 
     def contains_invalid_characters_in_name(self, name):
         """Vérifie si le champ 'Name' contient des caractères invalides."""
@@ -40,7 +40,7 @@ class AleProcessor:
 
     def extract_ep_num(self, name):
         """Extrait le numéro d'épisode."""
-        match = re.search(r"LGS-(\d{4})-", name)
+        match = re.search(r"NJ-(\d{4})", name)
         return match.group(1) if match else None
 
     def compute_storage_folderpath(self, ep_num):
