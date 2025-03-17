@@ -2,6 +2,7 @@ from flask import Flask, request, render_template_string, redirect, url_for, fla
 from ale_processor import AleProcessor
 import re
 import sys
+import sys
 import os
 import threading
 import webbrowser
@@ -213,7 +214,7 @@ def ingest():
     rows = app.config.get("ale_rows", [])
     processor = AleProcessor()
 
-    print(f"📊 Nombre de lignes reçues par /ingest : {len(rows)}")
+    print(f"Nombre de lignes reçues par /ingest : {len(rows)}")
 
     if rows:
         processor.rows = rows
@@ -221,14 +222,14 @@ def ingest():
 
         if csv_path:
             flash(f"Fichier CSV généré avec succès dans : {csv_path}", "success")
-            print(f"🎯 CSV sauvegardé à : {csv_path}")
+            print(f"CSV sauvegardé à : {csv_path}")
         else:
-            flash("⚠️ Échec de la création du CSV.", "error")
-            print("⚠️ Échec de la création du CSV.")
+            flash("Échec de la création du CSV.", "error")
+            print("Échec de la création du CSV.")
 
     else:
         flash("Aucune donnée disponible pour générer le CSV.", "error")
-        print("⚠️ Aucun rush disponible pour la génération du CSV.")
+        print("Aucun rush disponible pour la génération du CSV.")
 
     return redirect(url_for("index"))
 

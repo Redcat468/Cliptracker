@@ -162,31 +162,31 @@ class AleProcessor:
             with open("out_folder.ini", "r", encoding="utf-8") as file:
                 output_dir = file.readline().strip()
                 if not output_dir:
-                    raise ValueError("⚠️ Chemin de sortie vide dans 'out_folder.ini' !")
+                    raise ValueError("Chemin de sortie vide dans 'out_folder.ini' !")
         except FileNotFoundError:
-            print("❌ ERREUR : Le fichier 'out_folder.ini' est introuvable !")
+            print(" ERREUR : Le fichier 'out_folder.ini' est introuvable !")
             return None
         except ValueError as e:
-            print(f"❌ ERREUR : {e}")
+            print(f"ERREUR : {e}")
             return None
 
         # Vérifier et créer le dossier de sortie s'il n'existe pas
         if not os.path.exists(output_dir):
-            print(f"📁 Création du dossier de sortie : {output_dir}")
+            print(f"Création du dossier de sortie : {output_dir}")
             os.makedirs(output_dir, exist_ok=True)
 
-        # 🔥 Ajouter un timestamp au nom du CSV
+        # Ajouter un timestamp au nom du CSV
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")  # Format YYYYMMDD_HHMMSS
         output_file = f"output_{timestamp}.csv"
         output_path = os.path.join(output_dir, output_file)
 
         # Vérifier que les données existent
         if not self.rows:
-            print("⚠️ Aucun rush à enregistrer dans le CSV.")
+            print("Aucun rush à enregistrer dans le CSV.")
             return None
 
         headers = list(self.rows[0].keys())
-        print(f"📝 Colonnes du CSV : {headers}")
+        print(f"Colonnes du CSV : {headers}")
 
         # Écriture du fichier CSV
         try:
@@ -195,11 +195,11 @@ class AleProcessor:
                 writer.writeheader()
                 writer.writerows(self.rows)
 
-            print(f"✅ CSV écrit avec succès : {output_path}")
+            print(f"CSV écrit avec succès : {output_path}")
             return output_path
 
         except Exception as e:
-            print(f"❌ ERREUR lors de la création du CSV : {e}")
+            print(f"ERREUR lors de la création du CSV : {e}")
             return None
 
     # Ajout de la méthode calculate_total_duration
