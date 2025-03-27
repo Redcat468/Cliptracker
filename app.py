@@ -2,14 +2,12 @@ from flask import Flask, request, render_template_string, redirect, url_for, fla
 from ale_processor import AleProcessor
 import re
 import sys
-import sys
 import os
 import threading
 import webbrowser
 from pystray import Icon, MenuItem, Menu
 from PIL import Image
 from flask import send_file
-
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -31,6 +29,7 @@ template = """
         .flash-message { padding: 10px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; }
         .flash-error { background-color: #ffebee; color: #c62828; }
         .flash-success { background-color: #e8f5e9; color: #2e7d32; }
+        .flash-warning { background-color: #fff3e0; color: #ef6c00; }
         .btn { 
             display: inline-block; 
             padding: 10px 20px; 
@@ -46,6 +45,12 @@ template = """
         .btn:hover { 
             background-color: #45a049; 
             transform: translateY(-2px); 
+        }
+        .btn-red {
+            background-color: #d32f2f;
+        }
+        .btn-red:hover {
+            background-color: #c62828;
         }
         table { 
             width: 100%; 
@@ -85,9 +90,13 @@ template = """
     <script>
         function confirmIngest(hasErrors) {
             if (hasErrors) {
-                return confirm("Certaines elements contiennent des erreurs et les clips associés ne seront pas traités. Voulez-vous continuer ?");
+                return confirm("Certaines éléments contiennent des erreurs et les clips associés ne seront pas traités. Voulez-vous continuer ?");
             }
             return true;
+        }
+        // Nouvelle fonction de confirmation pour le bouton "Forcer le traitement"
+        function confirmForce() {
+            return confirm("ATTENTION, cette action peut creer des médias en double, ne faire cela que si l'envoi précédent a été correctement nettoyé auparavant !");
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -115,7 +124,7 @@ template = """
         {% if messages %}
             <div class="flash-message">
                 {% for category, message in messages %}
-                    <span class="{{ 'flash-' + category }}">{{ message }}</span><br>
+                    <span class="flash-{{ category }}">{{ message }}</span><br>
                 {% endfor %}
             </div>
         {% endif %}
@@ -141,10 +150,16 @@ template = """
     </form>
 
     {% if results %}
-        <!-- Bouton d'Ingest avec confirmation -->
-        <div style="text-align: center; margin-top: 20px;"> <!-- Ajout d'espace entre les boutons -->
-            <form method="POST" action="{{ url_for('ingest') }}" onsubmit="return confirmIngest({{ has_errors|tojson }})">
+        <!-- Boutons d'Ingest avec confirmation -->
+        <div style="text-align: center; margin-top: 20px;">
+            <!-- Bouton vert "Envoyer en traitement" -->
+            <form method="POST" action="{{ url_for('ingest') }}" onsubmit="return confirmIngest({{ has_errors|tojson }})" style="display: inline-block; margin-right: 10px;">
                 <button type="submit" class="btn">Envoyer en traitement</button>
+            </form>
+            <!-- Bouton rouge "Forcer le traitement" -->
+            <form method="POST" action="{{ url_for('ingest') }}" onsubmit="return confirmForce();" style="display: inline-block;">
+                <input type="hidden" name="force" value="true">
+                <button type="submit" class="btn btn-red">Forcer le traitement</button>
             </form>
         </div>
 
@@ -211,12 +226,17 @@ def index():
 
 @app.route("/ingest", methods=["POST"])
 def ingest():
+    # Détermination du mode forcé
+    force_flag = request.form.get("force") == "true"
     rows = app.config.get("ale_rows", [])
     processor = AleProcessor()
 
     print(f"Nombre de lignes reçues par /ingest : {len(rows)}")
 
     if rows:
+        # Ajout de la colonne FORCE_PROCESS pour chaque ligne
+        for row in rows:
+            row["FORCE_PROCESS"] = "TRUE" if force_flag else "FALSE"
         processor.rows = rows
         csv_path = processor.create_csv()
 
@@ -236,8 +256,5 @@ def ingest():
 def run_server():
     app.run(debug=True, host='0.0.0.0', port=5000)
 
-
 if __name__ == "__main__":
     run_server()
-
-    

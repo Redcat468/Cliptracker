@@ -728,18 +728,6 @@
   ('base_library.zip',
    'C:\\DEV\\METATRACKER\\build\\cliptracker\\base_library.zip',
    'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
-   'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\top_level.txt',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\top_level.txt',
-   'DATA'),
-  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
-   'DATA'),
   ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\INSTALLER',
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\INSTALLER',
@@ -747,6 +735,18 @@
   ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\WHEEL',
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\WHEEL',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\top_level.txt',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\top_level.txt',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
    'DATA'),
   ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\RECORD',
    'C:\\Users\\Félix '
@@ -761,85 +761,69 @@
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\jaraco\\text\\Lorem '
    'ipsum.txt',
    'DATA'),
-  ('MarkupSafe-3.0.2.dist-info\\INSTALLER',
+  ('itsdangerous-2.2.0.dist-info\\LICENSE.txt',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\INSTALLER',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\LICENSE.txt',
    'DATA'),
-  ('flask-3.1.0.dist-info\\INSTALLER',
+  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\LICENSE.txt',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\INSTALLER',
-   'DATA'),
-  ('werkzeug-3.1.3.dist-info\\WHEEL',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug-3.1.3.dist-info\\WHEEL',
-   'DATA'),
-  ('MarkupSafe-3.0.2.dist-info\\WHEEL',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\WHEEL',
-   'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\METADATA',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\METADATA',
-   'DATA'),
-  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\RECORD',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\RECORD',
-   'DATA'),
-  ('flask-3.1.0.dist-info\\REQUESTED',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\REQUESTED',
-   'DATA'),
-  ('flask-3.1.0.dist-info\\METADATA',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\METADATA',
-   'DATA'),
-  ('MarkupSafe-3.0.2.dist-info\\LICENSE.txt',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\LICENSE.txt',
-   'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\WHEEL',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\WHEEL',
-   'DATA'),
-  ('MarkupSafe-3.0.2.dist-info\\RECORD',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\RECORD',
-   'DATA'),
-  ('MarkupSafe-3.0.2.dist-info\\top_level.txt',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\top_level.txt',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\LICENSE.txt',
    'DATA'),
   ('flask-3.1.0.dist-info\\entry_points.txt',
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\entry_points.txt',
    'DATA'),
-  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\METADATA',
+  ('flask-3.1.0.dist-info\\METADATA',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\METADATA',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\METADATA',
    'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\RECORD',
+  ('flask-3.1.0.dist-info\\REQUESTED',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\RECORD',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\REQUESTED',
    'DATA'),
   ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\WHEEL',
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\WHEEL',
    'DATA'),
-  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\entry_points.txt',
+  ('werkzeug-3.1.3.dist-info\\METADATA',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\entry_points.txt',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug-3.1.3.dist-info\\METADATA',
    'DATA'),
-  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\REQUESTED',
+  ('werkzeug-3.1.3.dist-info\\RECORD',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\REQUESTED',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug-3.1.3.dist-info\\RECORD',
    'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\INSTALLER',
+  ('MarkupSafe-3.0.2.dist-info\\WHEEL',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\INSTALLER',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\WHEEL',
    'DATA'),
-  ('flask-3.1.0.dist-info\\LICENSE.txt',
+  ('flask-3.1.0.dist-info\\INSTALLER',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\LICENSE.txt',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('itsdangerous-2.2.0.dist-info\\RECORD',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\RECORD',
+   'DATA'),
+  ('itsdangerous-2.2.0.dist-info\\METADATA',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\METADATA',
+   'DATA'),
+  ('MarkupSafe-3.0.2.dist-info\\LICENSE.txt',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\LICENSE.txt',
+   'DATA'),
+  ('flask-3.1.0.dist-info\\WHEEL',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\WHEEL',
+   'DATA'),
+  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\RECORD',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\RECORD',
+   'DATA'),
+  ('MarkupSafe-3.0.2.dist-info\\METADATA',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\METADATA',
    'DATA'),
   ('werkzeug-3.1.3.dist-info\\INSTALLER',
    'C:\\Users\\Félix '
@@ -849,42 +833,58 @@
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\INSTALLER',
    'DATA'),
-  ('flask-3.1.0.dist-info\\WHEEL',
+  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\REQUESTED',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\WHEEL',
-   'DATA'),
-  ('werkzeug-3.1.3.dist-info\\RECORD',
-   'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug-3.1.3.dist-info\\RECORD',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\REQUESTED',
    'DATA'),
   ('flask-3.1.0.dist-info\\RECORD',
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\RECORD',
    'DATA'),
-  ('itsdangerous-2.2.0.dist-info\\LICENSE.txt',
+  ('itsdangerous-2.2.0.dist-info\\INSTALLER',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\LICENSE.txt',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\INSTALLER',
    'DATA'),
-  ('werkzeug-3.1.3.dist-info\\METADATA',
+  ('MarkupSafe-3.0.2.dist-info\\RECORD',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug-3.1.3.dist-info\\METADATA',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\RECORD',
+   'DATA'),
+  ('MarkupSafe-3.0.2.dist-info\\top_level.txt',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\top_level.txt',
    'DATA'),
   ('werkzeug-3.1.3.dist-info\\LICENSE.txt',
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug-3.1.3.dist-info\\LICENSE.txt',
    'DATA'),
-  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\LICENSE.txt',
+  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\METADATA',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\LICENSE.txt',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\METADATA',
    'DATA'),
-  ('MarkupSafe-3.0.2.dist-info\\METADATA',
+  ('setuptools\\_vendor\\wheel-0.43.0.dist-info\\entry_points.txt',
    'C:\\Users\\Félix '
-   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\METADATA',
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.43.0.dist-info\\entry_points.txt',
+   'DATA'),
+  ('MarkupSafe-3.0.2.dist-info\\INSTALLER',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\MarkupSafe-3.0.2.dist-info\\INSTALLER',
+   'DATA'),
+  ('flask-3.1.0.dist-info\\LICENSE.txt',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\flask-3.1.0.dist-info\\LICENSE.txt',
+   'DATA'),
+  ('itsdangerous-2.2.0.dist-info\\WHEEL',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\itsdangerous-2.2.0.dist-info\\WHEEL',
+   'DATA'),
+  ('werkzeug-3.1.3.dist-info\\WHEEL',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\werkzeug-3.1.3.dist-info\\WHEEL',
    'DATA')],
  [],
  False,
  False,
- 1742218646,
+ 1742995723,
  [('runw.exe',
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\runw.exe',

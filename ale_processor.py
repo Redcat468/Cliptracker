@@ -77,7 +77,6 @@ class AleProcessor:
         headers = lines[column_start_index].strip().split("\t")
         required_columns = ["Name", "Source File", "Source Path", "Session", "Duration"]
         column_indices = {col: headers.index(col) if col in headers else None for col in required_columns}
-        esta_idx = headers.index("Esta") if "Esta" in headers else None
         ingestator_idx = headers.index("Ingestator") if "Ingestator" in headers else None
         ingest_manuel_idx = headers.index("Ingest_manuel") if "Ingest_manuel" in headers else None
 
@@ -112,12 +111,14 @@ class AleProcessor:
             # Récupérer la durée
             duration_value = data.get("Duration", "")
 
-            # Ajouter la colonne ESTA
-            esta_value = "FALSE"  # Par défaut
-            esta_decorname = ""   # Champ vide par défaut
-            if esta_idx is not None and columns[esta_idx]:
-                esta_value = "TRUE"
-                esta_decorname = columns[esta_idx]  # Récupérer la valeur de la colonne "Esta"
+            # Traitement propre de la colonne ESTA_DECORNAME
+            esta_decorname = ""
+            if "ESTA_DECORNAME" in headers:
+                esta_decorname_idx = headers.index("ESTA_DECORNAME")
+                raw_value = columns[esta_decorname_idx] if esta_decorname_idx < len(columns) else ""
+                # Nettoyer : uniquement lettres majuscules sans caractère spécial ni espace
+                esta_decorname = re.sub(r"[^A-Z]", "", raw_value.upper())
+
 
             # Récupérer les valeurs des colonnes Ingest_manuel et Ingestator
             ingest_manuel_value = "FALSE"  # Par défaut
@@ -128,7 +129,6 @@ class AleProcessor:
             if ingestator_idx is not None and columns[ingestator_idx] == "1":
                 ingestator_value = "TRUE"
 
-            data["ESTA"] = esta_value
             data["ESTA_DECORNAME"] = esta_decorname
             data["Duration"] = duration_value
             data["INGEST_MANUEL"] = ingest_manuel_value
@@ -185,8 +185,21 @@ class AleProcessor:
             print("Aucun rush à enregistrer dans le CSV.")
             return None
 
+        # Récupérer les headers depuis la première ligne
         headers = list(self.rows[0].keys())
-        print(f"Colonnes du CSV : {headers}")
+        print(f"Colonnes du CSV avant réorganisation : {headers}")
+
+        # Réorganiser les colonnes pour que FORCE_PROCESS apparaisse après Session
+        if "Session" in headers:
+            if "FORCE_PROCESS" in headers:
+                headers.remove("FORCE_PROCESS")
+            session_index = headers.index("Session")
+            headers.insert(session_index + 1, "FORCE_PROCESS")
+        else:
+            if "FORCE_PROCESS" not in headers:
+                headers.append("FORCE_PROCESS")
+
+        print(f"Colonnes du CSV après réorganisation : {headers}")
 
         # Écriture du fichier CSV
         try:
