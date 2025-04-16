@@ -66,17 +66,21 @@ class AleProcessor:
         if column_start_index is None:
             self.log_global_error("Section 'Column' manquante.")
             return
+
         headers = lines[column_start_index].strip().split("\t")
-        required_columns = ["Name", "Start", "Esta", "Session", "End", "Ingestator", "Ingest_manuel", "Duration", "Source File", "Source Path"]
+        required_columns = [
+            "Name", "Start", "Esta_decorname", "Session", "End",
+            "Ingestator", "Ingest_manuel", "Duration", "Source File", "Source Path"
+        ]
         
         # Vérification de la présence de toutes les colonnes requises
         if not all(col in headers for col in required_columns):
             self.log_global_error("Colonnes manquantes dans le fichier ALE.")
             return
 
-        headers = lines[column_start_index].strip().split("\t")
+        # Re-définition de quelques colonnes essentielles
         required_columns = ["Name", "Source File", "Source Path", "Session", "Duration"]
-        column_indices = {col: headers.index(col) if col in headers else None for col in required_columns}
+        column_indices = {col: headers.index(col) for col in required_columns}
         ingestator_idx = headers.index("Ingestator") if "Ingestator" in headers else None
         ingest_manuel_idx = headers.index("Ingest_manuel") if "Ingest_manuel" in headers else None
 
@@ -94,33 +98,38 @@ class AleProcessor:
             data = {col: columns[idx] if idx < len(columns) else "" for col, idx in column_indices.items()}
             errors = []
 
+            # Vérification des colonnes requises
             if not all(data[col] for col in required_columns):
-                erreurs = [col for col in required_columns if not data[col]]
-                errors.append(f"Données manquantes ({', '.join(erreurs)}) à la ligne {row_idx}.")
+                missing = [col for col in required_columns if not data[col]]
+                errors.append(f"Données manquantes ({', '.join(missing)}) à la ligne {row_idx}.")
+
             if self.contains_special_characters(data["Source File"]):
                 errors.append("Caractères spéciaux dans le nom du fichier.")
             if self.contains_special_characters_in_path(data["Source Path"]):
                 errors.append("Caractères spéciaux dans le chemin du fichier.")
-            if self.contains_invalid_characters_in_name(data["Name"]):
-                errors.append("Caractère invalide dans la colonne 'Name'.")
-            if not self.extract_ep_num(data["Name"]):
-                errors.append("Numéro d'épisode invalide dans 'Name'.")
-            
+
+            # Traitement propre de la colonne ESTA_DECORNAME
+            esta_decorname = ""
+            if "Esta_decorname" in headers:
+                esta_decorname_idx = headers.index("Esta_decorname")
+                raw_value = columns[esta_decorname_idx] if esta_decorname_idx < len(columns) else ""
+                # Nettoyer : conserver uniquement les lettres majuscules, sans caractère spécial ni espace
+                esta_decorname = re.sub(r"[^A-Z-]", "", raw_value.upper())
+
+            # Vérification de la colonne Name uniquement si ESTA_DECORNAME est vide
+            if not esta_decorname:
+                if self.contains_invalid_characters_in_name(data["Name"]):
+                    errors.append("Caractère invalide dans la colonne 'Name'.")
+                if not self.extract_ep_num(data["Name"]):
+                    errors.append("Numéro d'épisode invalide dans 'Name'.")
+
+            # Construction du chemin complet
             data["Fullpath"] = os.path.join(data["Source Path"], data["Source File"])
 
             # Récupérer la durée
             duration_value = data.get("Duration", "")
 
-            # Traitement propre de la colonne ESTA_DECORNAME
-            esta_decorname = ""
-            if "ESTA_DECORNAME" in headers:
-                esta_decorname_idx = headers.index("ESTA_DECORNAME")
-                raw_value = columns[esta_decorname_idx] if esta_decorname_idx < len(columns) else ""
-                # Nettoyer : uniquement lettres majuscules sans caractère spécial ni espace
-                esta_decorname = re.sub(r"[^A-Z]", "", raw_value.upper())
-
-
-            # Récupérer les valeurs des colonnes Ingest_manuel et Ingestator
+            # Traitement des colonnes Ingest_manuel et Ingestator
             ingest_manuel_value = "FALSE"  # Par défaut
             if ingest_manuel_idx is not None and columns[ingest_manuel_idx] == "1":
                 ingest_manuel_value = "TRUE"
@@ -138,6 +147,7 @@ class AleProcessor:
             self.rows.append(data)
 
         self.duplicate_errors()
+
 
     def duplicate_errors(self):
         """Duplique les lignes avec plusieurs erreurs pour chaque erreur individuelle."""
