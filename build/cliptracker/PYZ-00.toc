@@ -532,6 +532,22 @@
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\argparse.py',
    'PYMODULE'),
+  ('asgiref',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\asgiref\\__init__.py',
+   'PYMODULE'),
+  ('asgiref.current_thread_executor',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\asgiref\\current_thread_executor.py',
+   'PYMODULE'),
+  ('asgiref.local',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\asgiref\\local.py',
+   'PYMODULE'),
+  ('asgiref.sync',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\asgiref\\sync.py',
+   'PYMODULE'),
   ('ast',
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\ast.py',
@@ -831,6 +847,202 @@
   ('copy',
    'C:\\Users\\Félix '
    'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\copy.py',
+   'PYMODULE'),
+  ('cryptography',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.__about__',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\__about__.py',
+   'PYMODULE'),
+  ('cryptography.exceptions',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\exceptions.py',
+   'PYMODULE'),
+  ('cryptography.hazmat',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat._oid',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\_oid.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.backends',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\backends\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.backends.openssl',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\backends\\openssl\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.backends.openssl.backend',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\backends\\openssl\\backend.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.bindings',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\bindings\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.bindings.openssl',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\bindings\\openssl\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.bindings.openssl._conditional',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\bindings\\openssl\\_conditional.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.bindings.openssl.binding',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\bindings\\openssl\\binding.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.decrepit',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\decrepit\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.decrepit.ciphers',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\decrepit\\ciphers\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.decrepit.ciphers.algorithms',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\decrepit\\ciphers\\algorithms.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives._asymmetric',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\_asymmetric.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives._cipheralgorithm',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\_cipheralgorithm.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives._serialization',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\_serialization.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.dh',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\dh.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.dsa',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\dsa.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.ec',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\ec.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.ed25519',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\ed25519.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.ed448',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\ed448.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.padding',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\padding.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.rsa',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\rsa.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.types',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\types.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.utils',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\utils.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.x25519',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\x25519.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.asymmetric.x448',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\asymmetric\\x448.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.ciphers',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\ciphers\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.ciphers.algorithms',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\ciphers\\algorithms.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.ciphers.base',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\ciphers\\base.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.ciphers.modes',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\ciphers\\modes.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.constant_time',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\constant_time.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.hashes',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\hashes.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.serialization',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\serialization\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.serialization.base',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\serialization\\base.py',
+   'PYMODULE'),
+  ('cryptography.hazmat.primitives.serialization.ssh',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\hazmat\\primitives\\serialization\\ssh.py',
+   'PYMODULE'),
+  ('cryptography.utils',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\utils.py',
+   'PYMODULE'),
+  ('cryptography.x509',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\x509\\__init__.py',
+   'PYMODULE'),
+  ('cryptography.x509.base',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\x509\\base.py',
+   'PYMODULE'),
+  ('cryptography.x509.certificate_transparency',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\x509\\certificate_transparency.py',
+   'PYMODULE'),
+  ('cryptography.x509.extensions',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\x509\\extensions.py',
+   'PYMODULE'),
+  ('cryptography.x509.general_name',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\x509\\general_name.py',
+   'PYMODULE'),
+  ('cryptography.x509.name',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\x509\\name.py',
+   'PYMODULE'),
+  ('cryptography.x509.oid',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\x509\\oid.py',
+   'PYMODULE'),
+  ('cryptography.x509.verification',
+   'C:\\Users\\Félix '
+   'Abt\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\cryptography\\x509\\verification.py',
    'PYMODULE'),
   ('csv',
    'C:\\Users\\Félix '

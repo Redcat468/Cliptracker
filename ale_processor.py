@@ -134,9 +134,9 @@ class AleProcessor:
             if ingest_manuel_idx is not None and columns[ingest_manuel_idx] == "1":
                 ingest_manuel_value = "TRUE"
 
-            ingestator_value = "FALSE"  # Par défaut
-            if ingestator_idx is not None and columns[ingestator_idx] == "1":
-                ingestator_value = "TRUE"
+            ingestator_value = ""  # Par défaut laisser cette variable vide
+            if ingestator_idx is not None and columns[ingestator_idx]:
+                ingestator_value = columns[ingestator_idx]  # Mettre la valeur présente dans ingestator_value
 
             data["ESTA_DECORNAME"] = esta_decorname
             data["Duration"] = duration_value
