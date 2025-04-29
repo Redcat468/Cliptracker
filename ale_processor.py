@@ -80,11 +80,10 @@ class AleProcessor:
         idx_ing = headers.index("Ingestator") if "Ingestator" in headers else None
         idx_man = headers.index("Ingest_manuel") if "Ingest_manuel" in headers else None
 
-        if any(col_idx_map[c] is None for c in essential):
-            self.log_global_error("Colonnes manquantes dans le fichier ALE.")
-            return
-        data_start = lines.index("Data") + 1 if "Data" in lines else None
-        if not data_start:
+        data_start = None
+        if "Data" in lines:
+            data_start = lines.index("Data") + 1
+        if data_start is None:
             self.log_global_error("Section 'Data' manquante.")
             return
 
@@ -92,11 +91,11 @@ class AleProcessor:
             cols = line.split("\t")
             data = {c: cols[col_idx_map[c]] if col_idx_map[c] < len(cols) else "" for c in essential}
             errors = []
-            # Valeurs manquantes
+            # Manquantes
             missing = [c for c in essential if not data[c]]
             if missing:
                 errors.append(f"Données manquantes ({', '.join(missing)}) à la ligne {r_idx}.")
-            # Caractères spéciaux
+            # Spéciaux
             if self.contains_special_characters(data["Source File"]):
                 errors.append("Caractères spéciaux dans le nom du fichier.")
             if self.contains_special_characters_in_path(data["Source Path"]):
@@ -104,64 +103,55 @@ class AleProcessor:
             # Odio
             if "Odio" in data["Name"] and not data["Source File"].lower().endswith(".wav"):
                 errors.append("Verifier le nommage car cela semble ne pas etre un son")
-            # ESTA_DECORNAME nettoyé
+            # ESTA_DECORNAME
             esta = ""
-            idx_decor = headers.index("Esta_decorname") if "Esta_decorname" in headers else None
-            if idx_decor is not None:
-                raw = cols[idx_decor] if idx_decor < len(cols) else ""
+            if "Esta_decorname" in headers:
+                i_decor = headers.index("Esta_decorname")
+                raw = cols[i_decor] if i_decor < len(cols) else ""
                 esta = re.sub(r"[^A-Z-]", "", raw.upper())
-            # Name/EP sequence
+            # Name / EP
             if not esta:
                 if self.contains_invalid_characters_in_name(data["Name"]):
                     errors.append("Caractère invalide dans la colonne 'Name'.")
                 if not self.extract_ep_num(data["Name"]):
                     errors.append("Numéro d'épisode invalide dans 'Name'.")
-                seq_pos = data["Name"].find("NJ-")
-                if seq_pos != -1:
-                    seq = data["Name"][seq_pos+3:seq_pos+9]
+                pos = data["Name"].find("NJ-")
+                if pos != -1:
+                    seq = data["Name"][pos+3:pos+9]
                     if not seq.isdigit():
                         errors.append("Vérifiez le nommage EPISODE SEQUENCE")
                 else:
                     errors.append("Vérifiez le nommage EPISODE SEQUENCE")
-            # Session format
+            # Session
             sess = data.get("Session", "")
             if not re.match(r"^[0-9]{6}_EQ[1-4]_(?:AM|PM)$", sess):
                 errors.append(f"La session semble mal nommée ({sess})")
-            # Chemins et ingest
+            # Fields add
             data["Fullpath"] = os.path.join(data["Source Path"], data["Source File"])
+            data["Duration"] = data.get("Duration", "")
             ingest_man = "FALSE"
             if idx_man is not None and cols[idx_man] == "1":
                 ingest_man = "TRUE"
             ingestator = cols[idx_ing] if idx_ing is not None and idx_ing < len(cols) else ""
-            # Affectation
             data["ESTA_DECORNAME"] = esta
             data["INGEST_MANUEL"] = ingest_man
             data["INGESTATOR"] = ingestator
-            data["Duration"] = data.get("Duration", "")
             data["errors"] = errors
             self.rows.append(data)
-        # Duplication avec dé-duplication
+
+        # Fusionner toutes les erreurs par ligne
         self.duplicate_errors()
 
     def duplicate_errors(self):
-        """Duplique les lignes avec erreurs sans doublons."""
+        """Combine toutes erreurs sur chaque ligne en un seul champ."""
         new_rows = []
-        seen = set()
         for row in self.rows:
-            for err in row.get("errors", []):
-                key = (row.get("Name"), row.get("Source File"), err)
-                if key not in seen:
-                    seen.add(key)
-                    nr = row.copy()
-                    nr["error"] = err
-                    new_rows.append(nr)
-        # Ajouter les lignes sans erreur
-        for row in self.rows:
-            if not row.get("errors"):
-                nr = row.copy()
-                nr["error"] = ""
-                new_rows.append(nr)
-        self.rows = sorted(new_rows, key=lambda x: bool(x.get("error")), reverse=True)
+            combined = " |  ".join(row.get("errors", []))
+            new_row = row.copy()
+            new_row["error"] = combined
+            new_rows.append(new_row)
+        # Trier : erreurs en premier
+        self.rows = sorted(new_rows, key=lambda x: bool(x["error"]), reverse=True)
 
     def create_csv(self):
         try:
@@ -193,7 +183,7 @@ class AleProcessor:
                 writer.writerows(self.rows)
             return path
         except Exception as e:
-            print(f"ERREUR lors de la création du CSV: {e}")
+            print(f"ERREUR CSV: {e}")
             return None
 
     def calculate_total_duration(self):
