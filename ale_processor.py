@@ -108,6 +108,10 @@ class AleProcessor:
             if self.contains_special_characters_in_path(data["Source Path"]):
                 errors.append("Caractères spéciaux dans le chemin du fichier.")
 
+            # Nouvelle vérification: Nom contenant 'Odio' sans fichier audio
+            if "Odio" in data["Name"] and not data["Source File"].lower().endswith(".wav"):
+                errors.append("Verifier le nommage car cela semble ne pas etre un son")
+
             # Traitement propre de la colonne ESTA_DECORNAME
             esta_decorname = ""
             if "Esta_decorname" in headers:
@@ -122,6 +126,14 @@ class AleProcessor:
                     errors.append("Caractère invalide dans la colonne 'Name'.")
                 if not self.extract_ep_num(data["Name"]):
                     errors.append("Numéro d'épisode invalide dans 'Name'.")
+                # Vérifier que les 6 caractères suivant 'NJ-' sont des chiffres
+                seq_start = data["Name"].find("NJ-")
+                if seq_start != -1:
+                    seq = data["Name"][seq_start+3:seq_start+3+6]
+                    if not seq.isdigit():
+                        errors.append("Vérifiez le nommage EPISODE SEQUENCE")
+                else:
+                    errors.append("Vérifiez le nommage EPISODE SEQUENCE")
 
             # Construction du chemin complet
             data["Fullpath"] = os.path.join(data["Source Path"], data["Source File"])
@@ -147,7 +159,6 @@ class AleProcessor:
             self.rows.append(data)
 
         self.duplicate_errors()
-
 
     def duplicate_errors(self):
         """Duplique les lignes avec plusieurs erreurs pour chaque erreur individuelle."""
@@ -273,7 +284,6 @@ class AleProcessor:
             hh, mm, ss = map(int, match.groups())
             return hh * 3600 + mm * 60 + ss
         return 0  # Retourne 0 si la conversion échoue
-
 
     def get_results(self):
         """Retourne les erreurs globales et les lignes traitées."""
