@@ -13,13 +13,15 @@ class AleProcessor:
                 line = file.readline().strip()
                 self.rtfactor = float(line.replace('O', '0'))
         except FileNotFoundError:
-            self.log_global_error("Fichier rtfactor.conf non trouvé, création du fichier avec la valeur par défaut.")
+            self.log_global_error(
+                "Fichier rtfactor.conf non trouvé, création du fichier avec la valeur par défaut."
+            )
             with open("rtfactor.conf", "w", encoding="utf-8") as file:
                 file.write("10.0")
             self.rtfactor = 10.0
         except ValueError as e:
-            self.log_global_error(f"Erreur lors de la lecture de rtfactor.conf : {str(e)}")
-            self.rtfactor = 10.0  # Valeur par défaut en cas d'erreur
+            self.log_global_error(f"Erreur lors de la lecture de rtfactor.conf : {e}")
+            self.rtfactor = 10.0
 
     def log_global_error(self, message):
         """Ajoute une erreur globale."""
@@ -31,7 +33,7 @@ class AleProcessor:
         return bool(re.search(r"[^a-zA-Z0-9=_\-\s]", name))
 
     def contains_special_characters_in_path(self, path):
-        """Vérifie les caractères spéciaux dans le chemin. Autorise /, \\, _, -, :, ., et les espaces"""
+        """Vérifie les caractères spéciaux dans le chemin."""
         return bool(re.search(r"[^a-zA-Z0-9=_\-\s/:\\\\]", path))
 
     def contains_invalid_characters_in_name(self, name):
@@ -40,8 +42,8 @@ class AleProcessor:
 
     def extract_ep_num(self, name):
         """Extrait le numéro d'épisode."""
-        match = re.search(r"NJ-(\d{4})", name)
-        return match.group(1) if match else None
+        m = re.search(r"NJ-(\d{4})", name)
+        return m.group(1) if m else None
 
     def compute_storage_folderpath(self, ep_num):
         """Calcule le chemin de stockage."""
@@ -54,237 +56,175 @@ class AleProcessor:
 
     def process_ale_file(self, ale_contents):
         """Analyse un fichier ALE."""
-        
         lines = ale_contents.splitlines()
-        column_start_index = None
-
+        col_idx = None
         for i, line in enumerate(lines):
             if line.strip() == "Column":
-                column_start_index = i + 1
+                col_idx = i + 1
                 break
-
-        if column_start_index is None:
+        if col_idx is None:
             self.log_global_error("Section 'Column' manquante.")
             return
-
-        headers = lines[column_start_index].strip().split("\t")
-        required_columns = [
-            "Name", "Start", "Esta_decorname", "Session", "End",
-            "Ingestator", "Ingest_manuel", "Duration", "Source File", "Source Path"
+        headers = lines[col_idx].split("\t")
+        required = [
+            "Name", "Start", "Esta_decorname", "Session",
+            "End", "Ingestator", "Ingest_manuel",
+            "Duration", "Source File", "Source Path"
         ]
-        
-        # Vérification de la présence de toutes les colonnes requises
-        if not all(col in headers for col in required_columns):
+        if not all(c in headers for c in required):
             self.log_global_error("Colonnes manquantes dans le fichier ALE.")
             return
 
-        # Re-définition de quelques colonnes essentielles
-        required_columns = ["Name", "Source File", "Source Path", "Session", "Duration"]
-        column_indices = {col: headers.index(col) for col in required_columns}
-        ingestator_idx = headers.index("Ingestator") if "Ingestator" in headers else None
-        ingest_manuel_idx = headers.index("Ingest_manuel") if "Ingest_manuel" in headers else None
+        essential = ["Name", "Source File", "Source Path", "Session", "Duration"]
+        col_idx_map = {c: headers.index(c) for c in essential}
+        idx_ing = headers.index("Ingestator") if "Ingestator" in headers else None
+        idx_man = headers.index("Ingest_manuel") if "Ingest_manuel" in headers else None
 
-        if any(idx is None for idx in column_indices.values()):
+        if any(col_idx_map[c] is None for c in essential):
             self.log_global_error("Colonnes manquantes dans le fichier ALE.")
             return
-
-        data_start_index = lines.index("Data") + 1 if "Data" in lines else None
-        if not data_start_index:
+        data_start = lines.index("Data") + 1 if "Data" in lines else None
+        if not data_start:
             self.log_global_error("Section 'Data' manquante.")
             return
 
-        for row_idx, row in enumerate(lines[data_start_index:], start=data_start_index + 1):
-            columns = row.strip().split("\t")
-            data = {col: columns[idx] if idx < len(columns) else "" for col, idx in column_indices.items()}
+        for r_idx, line in enumerate(lines[data_start:], start=data_start+1):
+            cols = line.split("\t")
+            data = {c: cols[col_idx_map[c]] if col_idx_map[c] < len(cols) else "" for c in essential}
             errors = []
-
-            # Vérification des colonnes requises
-            if not all(data[col] for col in required_columns):
-                missing = [col for col in required_columns if not data[col]]
-                errors.append(f"Données manquantes ({', '.join(missing)}) à la ligne {row_idx}.")
-
+            # Valeurs manquantes
+            missing = [c for c in essential if not data[c]]
+            if missing:
+                errors.append(f"Données manquantes ({', '.join(missing)}) à la ligne {r_idx}.")
+            # Caractères spéciaux
             if self.contains_special_characters(data["Source File"]):
                 errors.append("Caractères spéciaux dans le nom du fichier.")
             if self.contains_special_characters_in_path(data["Source Path"]):
                 errors.append("Caractères spéciaux dans le chemin du fichier.")
-
-            # Nouvelle vérification: Nom contenant 'Odio' sans fichier audio
+            # Odio
             if "Odio" in data["Name"] and not data["Source File"].lower().endswith(".wav"):
                 errors.append("Verifier le nommage car cela semble ne pas etre un son")
-
-            # Traitement propre de la colonne ESTA_DECORNAME
-            esta_decorname = ""
-            if "Esta_decorname" in headers:
-                esta_decorname_idx = headers.index("Esta_decorname")
-                raw_value = columns[esta_decorname_idx] if esta_decorname_idx < len(columns) else ""
-                # Nettoyer : conserver uniquement les lettres majuscules, sans caractère spécial ni espace
-                esta_decorname = re.sub(r"[^A-Z-]", "", raw_value.upper())
-
-            # Vérification de la colonne Name uniquement si ESTA_DECORNAME est vide
-            if not esta_decorname:
+            # ESTA_DECORNAME nettoyé
+            esta = ""
+            idx_decor = headers.index("Esta_decorname") if "Esta_decorname" in headers else None
+            if idx_decor is not None:
+                raw = cols[idx_decor] if idx_decor < len(cols) else ""
+                esta = re.sub(r"[^A-Z-]", "", raw.upper())
+            # Name/EP sequence
+            if not esta:
                 if self.contains_invalid_characters_in_name(data["Name"]):
                     errors.append("Caractère invalide dans la colonne 'Name'.")
                 if not self.extract_ep_num(data["Name"]):
                     errors.append("Numéro d'épisode invalide dans 'Name'.")
-                # Vérifier que les 6 caractères suivant 'NJ-' sont des chiffres
-                seq_start = data["Name"].find("NJ-")
-                if seq_start != -1:
-                    seq = data["Name"][seq_start+3:seq_start+3+6]
+                seq_pos = data["Name"].find("NJ-")
+                if seq_pos != -1:
+                    seq = data["Name"][seq_pos+3:seq_pos+9]
                     if not seq.isdigit():
                         errors.append("Vérifiez le nommage EPISODE SEQUENCE")
                 else:
                     errors.append("Vérifiez le nommage EPISODE SEQUENCE")
-
-            # Construction du chemin complet
+            # Session format
+            sess = data.get("Session", "")
+            if not re.match(r"^[0-9]{6}_EQ[1-4]_(?:AM|PM)$", sess):
+                errors.append(f"La session semble mal nommée ({sess})")
+            # Chemins et ingest
             data["Fullpath"] = os.path.join(data["Source Path"], data["Source File"])
-
-            # Récupérer la durée
-            duration_value = data.get("Duration", "")
-
-            # Traitement des colonnes Ingest_manuel et Ingestator
-            ingest_manuel_value = "FALSE"  # Par défaut
-            if ingest_manuel_idx is not None and columns[ingest_manuel_idx] == "1":
-                ingest_manuel_value = "TRUE"
-
-            ingestator_value = ""  # Par défaut laisser cette variable vide
-            if ingestator_idx is not None and columns[ingestator_idx]:
-                ingestator_value = columns[ingestator_idx]  # Mettre la valeur présente dans ingestator_value
-
-            data["ESTA_DECORNAME"] = esta_decorname
-            data["Duration"] = duration_value
-            data["INGEST_MANUEL"] = ingest_manuel_value
-            data["INGESTATOR"] = ingestator_value
-
+            ingest_man = "FALSE"
+            if idx_man is not None and cols[idx_man] == "1":
+                ingest_man = "TRUE"
+            ingestator = cols[idx_ing] if idx_ing is not None and idx_ing < len(cols) else ""
+            # Affectation
+            data["ESTA_DECORNAME"] = esta
+            data["INGEST_MANUEL"] = ingest_man
+            data["INGESTATOR"] = ingestator
+            data["Duration"] = data.get("Duration", "")
             data["errors"] = errors
             self.rows.append(data)
-
+        # Duplication avec dé-duplication
         self.duplicate_errors()
 
     def duplicate_errors(self):
-        """Duplique les lignes avec plusieurs erreurs pour chaque erreur individuelle."""
+        """Duplique les lignes avec erreurs sans doublons."""
         new_rows = []
+        seen = set()
         for row in self.rows:
-            errors = row.get("errors", [])
-            if errors:
-                for error in errors:
-                    new_row = row.copy()
-                    new_row["error"] = error
-                    new_rows.append(new_row)
-            else:
-                row["error"] = ""
-                new_rows.append(row)
+            for err in row.get("errors", []):
+                key = (row.get("Name"), row.get("Source File"), err)
+                if key not in seen:
+                    seen.add(key)
+                    nr = row.copy()
+                    nr["error"] = err
+                    new_rows.append(nr)
+        # Ajouter les lignes sans erreur
+        for row in self.rows:
+            if not row.get("errors"):
+                nr = row.copy()
+                nr["error"] = ""
+                new_rows.append(nr)
         self.rows = sorted(new_rows, key=lambda x: bool(x.get("error")), reverse=True)
 
     def create_csv(self):
-        """Crée un fichier CSV avec un timestamp dans le nom et l'enregistre dans le dossier défini par 'out_folder.ini'."""
-        
-        # Lire le chemin de sortie depuis out_folder.ini
         try:
-            with open("out_folder.ini", "r", encoding="utf-8") as file:
-                output_dir = file.readline().strip()
-                if not output_dir:
+            with open("out_folder.ini", "r", encoding="utf-8") as f:
+                out_dir = f.readline().strip()
+                if not out_dir:
                     raise ValueError("Chemin de sortie vide dans 'out_folder.ini' !")
-        except FileNotFoundError:
-            print(" ERREUR : Le fichier 'out_folder.ini' est introuvable !")
+        except Exception as e:
+            print(f"ERREUR: {e}")
             return None
-        except ValueError as e:
-            print(f"ERREUR : {e}")
-            return None
-
-        # Vérifier et créer le dossier de sortie s'il n'existe pas
-        if not os.path.exists(output_dir):
-            print(f"Création du dossier de sortie : {output_dir}")
-            os.makedirs(output_dir, exist_ok=True)
-
-        # Ajouter un timestamp au nom du CSV
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")  # Format YYYYMMDD_HHMMSS
-        output_file = f"output_{timestamp}.csv"
-        output_path = os.path.join(output_dir, output_file)
-
-        # Vérifier que les données existent
+        os.makedirs(out_dir, exist_ok=True)
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        path = os.path.join(out_dir, f"output_{ts}.csv")
         if not self.rows:
-            print("Aucun rush à enregistrer dans le CSV.")
+            print("Aucun rush à enregistrer.")
             return None
-
-        # Récupérer les headers depuis la première ligne
         headers = list(self.rows[0].keys())
-        print(f"Colonnes du CSV avant réorganisation : {headers}")
-
-        # Réorganiser les colonnes pour que FORCE_PROCESS apparaisse après Session
         if "Session" in headers:
             if "FORCE_PROCESS" in headers:
                 headers.remove("FORCE_PROCESS")
-            session_index = headers.index("Session")
-            headers.insert(session_index + 1, "FORCE_PROCESS")
+            idx = headers.index("Session")
+            headers.insert(idx+1, "FORCE_PROCESS")
         else:
-            if "FORCE_PROCESS" not in headers:
-                headers.append("FORCE_PROCESS")
-
-        print(f"Colonnes du CSV après réorganisation : {headers}")
-
-        # Écriture du fichier CSV
+            headers.append("FORCE_PROCESS")
         try:
-            with open(output_path, mode="w", newline="", encoding="utf-8") as file:
-                writer = csv.DictWriter(file, fieldnames=headers)
+            with open(path, "w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=headers)
                 writer.writeheader()
                 writer.writerows(self.rows)
-
-            print(f"CSV écrit avec succès : {output_path}")
-            return output_path
-
+            return path
         except Exception as e:
-            print(f"ERREUR lors de la création du CSV : {e}")
+            print(f"ERREUR lors de la création du CSV: {e}")
             return None
 
-    # Ajout de la méthode calculate_total_duration
     def calculate_total_duration(self):
-        """Additionne les durées des fichiers non .WAV et retourne un format lisible."""
         total_frames = 0
-        fps = 25  # Images par seconde (frames per second)
-
-
+        fps = 25
         for row in self.rows:
-            source_file = row.get("Source File", "")
-            duration = row.get("Duration", "")
-
-            # Ignorer les fichiers .WAV
-            if source_file.lower().endswith(".wav"):
-                continue
-
-            # Vérifier si la durée est au bon format HH:MM:SS:FF
-            if duration and re.match(r"^\d{2}:\d{2}:\d{2}:\d{2}$", duration):
-                hh, mm, ss, ff = map(int, duration.split(":"))
-                total_frames += (hh * 3600 + mm * 60 + ss) * fps + ff
-
-        # Conversion des frames en HH:MM:SS
-        total_seconds, remaining_frames = divmod(total_frames, fps)
-        hours, remainder = divmod(total_seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-
-        return f"{hours:02} heures {minutes:02} min {seconds:02} secondes"
+            sf = row.get("Source File", "").lower()
+            dur = row.get("Duration", "")
+            if sf.endswith(".wav"): continue
+            if re.match(r"^\d{2}:\d{2}:\d{2}:\d{2}$", dur):
+                hh, mm, ss, ff = map(int, dur.split(':'))
+                total_frames += (hh*3600 + mm*60 + ss)*fps + ff
+        sec, _ = divmod(total_frames, fps)
+        h, rem = divmod(sec, 3600)
+        m, s = divmod(rem, 60)
+        return f"{h:02} heures {m:02} min {s:02} secondes"
 
     def calculate_adjusted_duration(self):
-        """Calcule la durée ajustée en divisant la durée totale par le facteur rtfactor."""
-        total_duration = self.calculate_total_duration()
-        total_seconds = self._convert_duration_to_seconds(total_duration)
-        
-        # Diviser par le facteur rtfactor
-        adjusted_seconds = total_seconds / self.rtfactor
-        
-        # Conversion des secondes ajustées en HH:MM:SS
-        hours, remainder = divmod(int(adjusted_seconds), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        
-        return f"{hours:02} heures {minutes:02} min {seconds:02} secondes"
+        td = self.calculate_total_duration()
+        secs = self._convert_duration_to_seconds(td)
+        adj = secs / self.rtfactor
+        h, rem = divmod(int(adj), 3600)
+        m, s = divmod(rem, 60)
+        return f"{h:02} heures {m:02} min {s:02} secondes"
 
     def _convert_duration_to_seconds(self, duration):
-        """Convertit une durée au format 'HH heures MM min SS secondes' en secondes."""
-        match = re.match(r"(\d{2}) heures (\d{2}) min (\d{2}) secondes", duration)
-        if match:
-            hh, mm, ss = map(int, match.groups())
-            return hh * 3600 + mm * 60 + ss
-        return 0  # Retourne 0 si la conversion échoue
+        m = re.match(r"(\d{2}) heures (\d{2}) min (\d{2}) secondes", duration)
+        if m:
+            hh, mm, ss = map(int, m.groups())
+            return hh*3600 + mm*60 + ss
+        return 0
 
     def get_results(self):
-        """Retourne les erreurs globales et les lignes traitées."""
         return {"global_errors": self.global_errors, "rows": self.rows}
